@@ -15,10 +15,14 @@ where an agent's claims become the system's facts, by evidence rather than asser
 
 ## Status
 
-**Early and active** (started September 2026). Currently: Phase 0 complete —
-[Foundation Map](docs/architecture/FOUNDATION_MAP.md), connecting the completed
-[Concurrent and Distributed Systems in Rust](https://github.com/luca-zanolini/distributed-systems-in-rust)
-course to this system's design. Phase 1 (the model-call layer) is next.
+**Active** (started September 2026).
+
+| Stage | State | Highlights |
+|---|---|---|
+| 0 — [Foundation map](docs/architecture/FOUNDATION_MAP.md) | done | The two-plane principle; the DS mechanisms each agent failure maps to. |
+| 1 — [LLM runtime](01-llm-runtime/) | done | Provider-neutral adapter with a receipt per call and a three-way failure taxonomy; free-form vs structured output measured (N=30 per arm: 2.4× cheaper, 1 distinct answer in 30). |
+| 2 — [Single agent](02-single-agent/) | done | Framework-free agent loop; a six-step gate on every tool request; a 20-case failure suite (escapes, injection, hangs, runaway loops, partial writes). |
+| 3 — Resumable agent | next | Durable run state, crash recovery without repeating irreversible work. |
 
 ## The staircase
 
@@ -48,6 +52,9 @@ of the previous one:
 11. **Verifiable execution** — evidence-based commit policies.
 12. **Chaos and formal models** — fault injection and model-checked coordination
     invariants.
+
+The full stage-by-stage plan — deliverables, failure experiments, exit criteria,
+and target weeks through the capstone — is in [ROADMAP.md](ROADMAP.md).
 
 Built on: [distributed-systems-in-rust](https://github.com/luca-zanolini/distributed-systems-in-rust) —
 twelve implemented modules from replicated registers to Raft, PBFT, transactional
