@@ -1,11 +1,24 @@
-import anthropic
+"""Free-form vs structured output on one extraction task, N runs each.
+
+Usage: python measure.py [N] [MODEL]      (defaults: 10, claude-opus-4-8)
+
+Reports, per arm: output tokens, latency, cost per call, and the number of
+distinct answers across the N runs. Every call goes through the adapter.
+"""
+
+import statistics
+import sys
+
 from pydantic import BaseModel
-import time
+
+from llm import AnthropicProvider, Completion
+
 
 class TestReport(BaseModel):
     passed: bool
     tests_run: int
     failures: list[str]
+
 
 FAKE_LOG = """
 running 5 tests
@@ -19,48 +32,39 @@ failures: fencing::stale_writer_rejected — assertion failed: expected Rejected
 test result: FAILED. 4 passed; 1 failed
 """
 
-PRICE_IN_PER_MTOK = 5.00
-PRICE_OUT_PER_MTOK = 25.00
 
-client = anthropic.Anthropic()
+def run_arm(provider, label: str, prompt: str, n: int, schema=None) -> list[Completion]:
+    print(f"== {label} ==")
+    runs = []
+    for i in range(n):
+        c = provider.complete(prompt, schema=schema, max_tokens=1000)
+        print(f"run={i} latency={c.latency_s:.2f}s in={c.input_tokens} "
+              f"out={c.output_tokens} cost=${c.cost_usd:.6f} stop={c.stop}")
+        runs.append(c)
+    return runs
 
-print("== free-form ==")
 
-for i in range(10):
+def summarize(label: str, runs: list[Completion]) -> None:
+    outs = [c.output_tokens for c in runs]
+    lats = [c.latency_s for c in runs]
+    answers = {c.text if c.parsed is None else c.parsed.model_dump_json() for c in runs}
+    print(f"{label:<12} in={runs[0].input_tokens:<4} "
+          f"out={min(outs)}–{max(outs)} (mean {statistics.mean(outs):.0f})  "
+          f"latency={min(lats):.2f}–{max(lats):.2f}s (mean {statistics.mean(lats):.2f})  "
+          f"cost/call=${statistics.mean(c.cost_usd for c in runs):.6f}  "
+          f"distinct answers={len(answers)}/{len(runs)}")
 
-    t0 = time.perf_counter()
 
-    response = client.messages.create(
-        model="claude-opus-4-8",
-        max_tokens=1000,
-        messages=[{"role": "user", "content": f"Give me a summary of the log:\n{FAKE_LOG}"}],
-    )
+if __name__ == "__main__":
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 10
+    provider = AnthropicProvider(model=sys.argv[2]) if len(sys.argv) > 2 else AnthropicProvider()
 
-    latency = time.perf_counter() - t0
-    cost = response.usage.input_tokens * (PRICE_IN_PER_MTOK/1000000) + response.usage.output_tokens * (PRICE_OUT_PER_MTOK/1000000)
+    free = run_arm(provider, "free-form", f"Give me a summary of the log:\n{FAKE_LOG}", n)
+    structured = run_arm(provider, "structured", f"Extract a test report from this log:\n{FAKE_LOG}", n,
+                         schema=TestReport)
 
-    # for block in response.content:
-    #     if block.type == "text":
-    #         print(block.text)
-
-    print(f"run={i} Latency: {latency:.2f} in={response.usage.input_tokens} out={response.usage.output_tokens} cost=${cost:.6f} stop={response.stop_reason}")
-
-print("== structured ==")
-
-for i in range(10):
-
-    t0 = time.perf_counter()
-
-    response = client.messages.parse(
-        model="claude-opus-4-8",
-        max_tokens=500,
-        messages=[{"role": "user", "content": f"Extract a test report from this log:\n{FAKE_LOG}"}],
-        output_format=TestReport,
-    )
-
-    latency = time.perf_counter() - t0
-    cost = response.usage.input_tokens * (PRICE_IN_PER_MTOK/1000000) + response.usage.output_tokens * (PRICE_OUT_PER_MTOK/1000000)
-
-    print(response.parsed_output)
-
-    print(f"run={i} Latency: {latency:.2f} in={response.usage.input_tokens} out={response.usage.output_tokens} cost=${cost:.6f} stop={response.stop_reason}")
+    print(f"\n== summary (model={provider.model}, N={n}) ==")
+    summarize("free-form", free)
+    summarize("structured", structured)
+    total = sum(c.cost_usd for c in free + structured)
+    print(f"total spend: ${total:.4f}")
