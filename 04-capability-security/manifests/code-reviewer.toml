@@ -1,0 +1,18 @@
+# A reviewer reads the repository and may consult the Python documentation.
+# It never writes, never sees credentials, and never talks to arbitrary hosts.
+
+role = "code-reviewer"
+pins_file = "pins.json"
+
+[tools]
+allow = ["read_file", "list_dir", "search"]
+ask   = ["fetch_url"]
+# everything else (write_file, send_message, ...) is denied by default
+
+[paths]
+arguments = ["path"]
+secret = [".env", "*.env", "*.pem", "*.key", "*id_rsa*", "*id_ed25519*", "secrets/*", "*credentials*"]
+
+[egress]
+arguments = ["url"]
+allow_hosts = ["docs.python.org"]
