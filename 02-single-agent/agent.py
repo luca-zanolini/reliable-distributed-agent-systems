@@ -136,15 +136,24 @@ class Agent:
     # --- the gate: every request passes through here ----------------------
 
     def execute(self, call: ToolCall, seen: dict[str, int], log) -> ToolResult:
-        def reply(kind: str, content: str, is_error: bool = True) -> ToolResult:
-            preview = content[:100].replace("\n", " ⏎ ")
-            log(kind, f"{call.name}: {preview}{'…' if len(content) > 100 else ''}")
-            return ToolResult(call.id, content, is_error)
+        decision = self.authorize(call, seen, log)
+        if isinstance(decision, ToolResult):
+            return decision                             # refused: nothing runs
+        tool, args, _ = decision
+        return self.perform(call, tool, args, log)
 
+    def _reply(self, call: ToolCall, log, kind: str, content: str, is_error: bool = True) -> ToolResult:
+        preview = content[:100].replace("\n", " ⏎ ")
+        log(kind, f"{call.name}: {preview}{'…' if len(content) > 100 else ''}")
+        return ToolResult(call.id, content, is_error)
+
+    def authorize(self, call: ToolCall, seen: dict[str, int], log):
+        """Checks 1-4. Returns a refusal (ToolResult), or (tool, args, repeat_key)."""
         # 1. Is it a tool we offered?
         tool = self.tools.get(call.name)
         if tool is None:
-            return reply("rejected", f"unknown tool {call.name!r}; available: {', '.join(self.tools)}")
+            return self._reply(call, log, "rejected",
+                               f"unknown tool {call.name!r}; available: {', '.join(self.tools)}")
 
         # 2. Are the arguments well-formed?
         try:
@@ -152,31 +161,40 @@ class Agent:
         except pydantic.ValidationError as e:
             problems = "; ".join(f"{'.'.join(map(str, err['loc'])) or 'arguments'}: {err['msg']}"
                                  for err in e.errors())
-            return reply("rejected", f"invalid arguments: {problems}")
+            return self._reply(call, log, "rejected", f"invalid arguments: {problems}")
 
         # 3. Is it allowed? Every declared path must stay inside the workspace.
         for name in tool.path_args:
             try:
                 self.ws.resolve(getattr(args, name))
             except PermissionError as e:
-                return reply("denied", f"denied: {e}")
+                return self._reply(call, log, "denied", f"denied: {e}")
 
         # 4. Is it a runaway repeat?
         key = call.name + json.dumps(args.model_dump(), sort_keys=True)
         seen[key] = seen.get(key, 0) + 1
         if seen[key] > self.budget.max_identical_calls:
-            return reply("rejected", "refused: identical call already made; use the earlier result")
+            return self._reply(call, log, "rejected",
+                               "refused: identical call already made; use the earlier result")
+        return tool, args, key
+
+    def perform(self, call: ToolCall, tool: Tool, args, log, idempotency_key: str | None = None) -> ToolResult:
+        """Checks 5-6: run the authorized action, bounded in time and output."""
+        if tool.effect == "keyed":
+            work = lambda: tool.run(self.ws, args, idempotency_key)
+        else:
+            work = lambda: tool.run(self.ws, args)
 
         # 5. Run it, bounded in time.
         try:
-            output = _run_with_timeout(lambda: tool.run(self.ws, args), self.budget.tool_timeout_s)
+            output = _run_with_timeout(work, self.budget.tool_timeout_s)
         except ToolTimeout as e:
-            return reply("failed", f"tool {e}")
+            return self._reply(call, log, "failed", f"tool {e}")
         except Exception as e:
-            return reply("failed", f"tool failed: {type(e).__name__}: {e}")
+            return self._reply(call, log, "failed", f"tool failed: {type(e).__name__}: {e}")
 
         # 6. Bound the output before it enters the history.
         cap = self.budget.max_tool_output_chars
         if len(output) > cap:
             output = output[:cap] + f"\n[truncated: {cap} of {len(output)} characters shown]"
-        return reply("executed", output, is_error=False)
+        return self._reply(call, log, "executed", output, is_error=False)

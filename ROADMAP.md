@@ -62,7 +62,7 @@ The observe/decide/act loop from first principles, no framework.
 - **Exit:** the loop survives the full malformed-tool suite with explicit handling
   for each case.
 
-## Stage 3 — Durable State, Checkpointing, Recovery *(weeks 6–7)*
+## Stage 3 — Durable State, Checkpointing, Recovery *(complete)*
 
 From toy loop to resumable system.
 

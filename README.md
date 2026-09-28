@@ -22,7 +22,8 @@ where an agent's claims become the system's facts, by evidence rather than asser
 | 0 — [Foundation map](docs/architecture/FOUNDATION_MAP.md) | done | The two-plane principle; the DS mechanisms each agent failure maps to. |
 | 1 — [LLM runtime](01-llm-runtime/) | done | Provider-neutral adapter with a receipt per call and a three-way failure taxonomy; free-form vs structured output measured (N=30 per arm: 2.4× cheaper, 1 distinct answer in 30). |
 | 2 — [Single agent](02-single-agent/) | done | Framework-free agent loop; a six-step gate on every tool request; a 20-case failure suite (escapes, injection, hangs, runaway loops, partial writes). |
-| 3 — Resumable agent | next | Durable run state, crash recovery without repeating irreversible work. |
+| 3 — [Resumable agent](03-resumable-agent/) | done | Write-ahead journal; state rebuilt by replay; recovery by effect class (re-run / same idempotency key / never retry). Killed mid-action: naive restart duplicates every effect, durable resume performs each once. |
+| 4 — Tools, sandboxes, capability security | next | Real isolation, least privilege, prompt injection. |
 
 ## The staircase
 

@@ -3,6 +3,29 @@
 An agent built from first principles, without a framework: a model inside a loop,
 where the model **requests** actions and the runtime **authorizes and executes** them.
 
+## At a glance
+
+```mermaid
+flowchart LR
+    MODEL["<b>Model</b><br/>untrusted · stateless<br/>history in →<br/>answer or tool requests out"]
+    OBJ(["objective"])
+    subgraph RT["Runtime · trusted"]
+        RUN["<b>run()</b> · the loop<br/>owns the history<br/>enforces step and<br/>cost budgets"]
+        GATE["<b>execute()</b> · the gate<br/>1 · known tool<br/>2 · valid arguments<br/>3 · paths inside workspace<br/>4 · not a runaway repeat<br/>5 · finishes within timeout<br/>6 · output bounded"]
+    end
+    MODEL -- "answer or tool requests" --> RUN
+    OBJ --> RUN
+    RUN -- "whole history + tool menu" --> MODEL
+    RUN -- "each tool request" --> GATE
+    GATE -- "result, or why it was refused" --> RUN
+    GATE -- "only if checks 1–4 pass" --> TOOLS["<b>Tools</b><br/>read_file · list_dir<br/>search · calculate<br/>write_file"]
+    TOOLS --> WS[("Workspace<br/>folder")]
+    RUN --> OUT(["<b>RunResult</b><br/>answered · step_budget<br/>cost_budget · aborted"])
+```
+
+The model proposes; the runtime disposes. `run()` owns the loop and the history;
+`execute()` decides, for every request, whether anything happens at all.
+
 ## Files
 
 | File | Purpose |
@@ -37,6 +60,27 @@ repeat, within the step and cost budgets:
 The model is stateless, so the history is the agent's entire memory. It is owned
 by the runtime and re-sent in full on every step.
 
+One run over time (the live demo below):
+
+```mermaid
+sequenceDiagram
+    participant R as run() · the loop
+    participant M as Model
+    participant G as execute() · the gate
+    participant W as Workspace
+    R->>M: objective + tool menu
+    M-->>R: request list_dir(".")
+    R->>G: list_dir(".")
+    G->>W: checks 1–4 pass, run it
+    W-->>G: docs/  src/  test-output.log
+    G-->>R: result, tagged with the request id
+    R->>M: whole history again (the model remembers nothing)
+    M-->>R: request read_file(test-output.log) and list_dir(src)
+    Note over R,W: each request passes the gate separately · model steps 3 and 4 repeat the pattern
+    R->>M: whole history again
+    M-->>R: final answer · no requests, so the loop ends
+```
+
 ## The gate
 
 Every tool request passes through six checks, in order. A request that fails a
@@ -56,6 +100,9 @@ Authorization (check 3) runs **before** execution, from the tool's declared path
 arguments, and does not depend on the model's intent. A planted instruction may
 persuade the model to *ask* for a secret; the request is checked like any other.
 Tools re-check paths themselves as defense in depth.
+
+`execute()` is composed of `authorize()` (checks 1–4, which decide) and `perform()`
+(checks 5–6, which act). Stage 3 journals an intent between the two.
 
 **Termination.** A run ends as `answered`, `step_budget`, `cost_budget`, or
 `aborted` (provider failure, or unusable output; the spend is still accounted).

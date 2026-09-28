@@ -3,6 +3,23 @@
 A model call treated as an engineered component: a stateless function behind a
 provider-neutral interface, returning a receipt the application owns.
 
+## At a glance
+
+```mermaid
+flowchart LR
+    APP["<b>Application code</b><br/>measure.py · the agent loop"]
+    P{{"<b>Provider</b> interface<br/>complete(prompt, schema)<br/>step(history, tools)"}}
+    AP["<b>AnthropicProvider</b><br/>SDK retries transport<br/>failures, bounded"]
+    FP["<b>FakeProvider</b><br/>scripted · offline · free"]
+    API[("Model API")]
+    APP --> P
+    P --> AP -- "HTTPS" --> API
+    P --> FP
+    AP -- "<b>Completion</b> receipt<br/>text or parsed object · stop<br/>tokens · latency · cost" --> APP
+    FP -- "same receipt" --> APP
+    AP -. "TransientError · RequestError<br/>OutputError, carrying its receipt" .-> APP
+```
+
 ## Files
 
 | File | Purpose |

@@ -39,8 +39,14 @@ class Tool:
     name: str
     description: str
     args: type[BaseModel]
-    run: Callable[[Workspace, BaseModel], str]
+    run: Callable[..., str]
     path_args: tuple[str, ...] = ()     # argument names the runtime must authorize
+    # What re-running this tool does, which decides crash recovery (Stage 3):
+    #   "read"       no side effects: safe to re-run
+    #   "idempotent" re-running leaves the same end state: safe to re-run
+    #   "keyed"      side effect deduplicated by an idempotency key the runtime supplies
+    #   "unsafe"     re-running repeats the effect: never re-run automatically
+    effect: str = "read"
 
 
 # --- read_file --------------------------------------------------------------
@@ -159,4 +165,4 @@ READ_ONLY = [
 ]
 
 WRITE_FILE = Tool("write_file", "Create or overwrite a text file in the workspace.",
-                  WriteFileArgs, write_file, ("path",))
+                  WriteFileArgs, write_file, ("path",), effect="idempotent")
