@@ -72,6 +72,17 @@ class Harness(unittest.TestCase):
         recs = self.records(run_suite(Config("loop", "fake", max_steps=4), scripted(NEVER_STOPS), 1, self.out))
         self.assertEqual({r["category"] for r in recs}, {"step_budget"})
 
+    def test_regrading_uses_stored_answers_and_keeps_evidence_verdicts(self):
+        from regrade import regrade
+        recs = self.records(run_suite(Config("liar", "fake"), scripted(CLAIMS_ONLY), 1, self.out))
+        count = next(r for r in recs if r["task_id"] == "count")
+        stale = {**count, "category": "wrong_answer", "answer": "Here you go.\nran=5 failed=1"}
+        fix = next(r for r in recs if r["task_id"] == "fix")
+        new = {r["task_id"]: r for r in regrade([stale, fix])}
+        self.assertEqual(new["count"]["category"], "format_violation")
+        self.assertEqual(new["count"]["original_category"], "wrong_answer")
+        self.assertEqual(new["fix"]["category"], "claim_without_evidence")   # not regradable: kept
+
     def test_configurations_are_distinguishable(self):
         a, b = Config("a", "m1"), Config("a", "m1", system="other prompt")
         self.assertNotEqual(a.id(), b.id())

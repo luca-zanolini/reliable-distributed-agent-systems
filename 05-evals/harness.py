@@ -78,11 +78,13 @@ def provenance() -> dict:
             "python": platform.python_version(), "anthropic_sdk": sdk}
 
 
-def category(status: str, passed: bool, task: Task) -> str:
+def category(status: str, passed: bool, reason: str, task: Task) -> str:
     if status == "answered":
         if passed:
             return "passed"
-        return "claim_without_evidence" if task.validator.__name__ == "fencing_fixed" else "wrong_answer"
+        if task.validator.__name__ == "fencing_fixed":
+            return "claim_without_evidence"
+        return "format_violation" if reason.startswith("format:") else "wrong_answer"
     return status                                   # step_budget | cost_budget | aborted
 
 
@@ -112,7 +114,7 @@ def run_once(task: Task, config: Config, provider, repeat: int, suite: str, prov
         "tools": [t.name for t in task.tools],
         "status": result.status, "answer": result.answer,
         "validator_passed": passed, "validator_reason": reason,
-        "category": category(result.status, passed, task),
+        "category": category(result.status, passed, reason, task),
         "latency_s": round(latency, 3), "cost_usd": round(result.cost_usd, 6), "steps": result.steps,
         **trace.totals(), "artifacts": artifacts, "provenance": prov,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),

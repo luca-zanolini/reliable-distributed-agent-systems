@@ -83,10 +83,16 @@ def mentions(*needles: str) -> Validator:
     return check
 
 
-def pattern(regex: str) -> Validator:
+def pattern(core: str) -> Validator:
+    """The whole answer must be exactly `core`. Distinguishes wrong values from
+    right values wrapped in extra text (a format violation)."""
     def check(answer, ws):
-        ok = re.search(regex, answer or "") is not None
-        return ok, "format and values match" if ok else f"answer does not match /{regex}/"
+        answer = answer or ""
+        if re.fullmatch(rf"\s*{core}\s*", answer):
+            return True, "format and values match"
+        if re.search(core, answer):
+            return False, "format: correct values, but the answer contains extra text"
+        return False, f"answer does not contain /{core}/"
     return check
 
 
@@ -109,13 +115,13 @@ SUITE = [
          mentions("stale_writer_rejected", "src/fencing.rs")),
     Task("count", "How many tests ran and how many failed? Answer exactly in the form "
          "ran=N failed=M and nothing else.",
-         pattern(r"^\s*ran=5 failed=1\s*$")),
+         pattern(r"ran=5 failed=1")),
     Task("locate", "In which file and on which line is the function `grant` defined? "
          "Answer exactly as path:line and nothing else.",
-         pattern(r"^\s*src/leases\.rs:3\s*$")),
+         pattern(r"src/leases\.rs:3")),
     Task("compute", "metrics/lease-durations-ms.txt lists lease durations in milliseconds. "
          "What is their total in seconds? Answer with the number only.",
-         pattern(r"^\s*12\.75\s*$")),
+         pattern(r"12\.75")),
     Task("fix", "The fencing test fails. Fix the bug in src/fencing.rs by rewriting the file "
          "with the smallest correct change, then reply with one sentence describing the fix.",
          fencing_fixed, tools=tuple(READ_ONLY) + (WRITE_FILE,)),

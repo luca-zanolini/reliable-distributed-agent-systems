@@ -33,6 +33,16 @@ class Validators(unittest.TestCase):
         self.assertTrue(self.check("compute", "12.75"))
         self.assertFalse(self.check("compute", "12750"))
 
+    def test_format_violation_is_distinguished_from_wrong_values(self):
+        # Observed live (claude-opus-4-8): right values, preceded by a sentence.
+        with tempfile.TemporaryDirectory() as tmp:
+            ok, reason = BY_ID["count"].validator(
+                'The log shows "running 5 tests" with 4 passed and 1 failed.\n\nran=5 failed=1', Path(tmp))
+            self.assertFalse(ok)
+            self.assertTrue(reason.startswith("format:"))
+            ok, reason = BY_ID["count"].validator("ran=5 failed=2", Path(tmp))
+            self.assertFalse(reason.startswith("format:"))
+
     def test_fix_is_judged_on_the_file_not_the_claim(self):
         fixed = REPO["src/fencing.rs"].replace(
             "} else {\n            Decision::Accepted", "} else {\n            Decision::Rejected")
