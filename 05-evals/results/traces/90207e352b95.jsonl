@@ -1,0 +1,11 @@
+{"run_id": "90207e352b95", "seq": 0, "kind": "model_call", "start_s": 0.0023, "duration_s": 1.908, "input_tokens": 1155, "output_tokens": 70, "cost_usd": 0.00301, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "90207e352b95", "seq": 1, "kind": "tool_call", "start_s": 1.9103, "duration_s": 0.0008, "tool": "read_file", "outcome": "executed", "is_error": false}
+{"run_id": "90207e352b95", "seq": 2, "kind": "model_call", "start_s": 1.9112, "duration_s": 1.8232, "input_tokens": 1391, "output_tokens": 87, "cost_usd": 0.003652, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "90207e352b95", "seq": 3, "kind": "tool_call", "start_s": 3.7345, "duration_s": 0.0015, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "90207e352b95", "seq": 4, "kind": "model_call", "start_s": 3.736, "duration_s": 1.5999, "input_tokens": 1490, "output_tokens": 70, "cost_usd": 0.00368, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "90207e352b95", "seq": 5, "kind": "tool_call", "start_s": 5.3359, "duration_s": 0.0024, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "90207e352b95", "seq": 6, "kind": "model_call", "start_s": 5.3383, "duration_s": 2.382, "input_tokens": 1674, "output_tokens": 138, "cost_usd": 0.004728, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "90207e352b95", "seq": 7, "kind": "tool_call", "start_s": 7.7203, "duration_s": 0.001, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "90207e352b95", "seq": 8, "kind": "model_call", "start_s": 7.7213, "duration_s": 2.7257, "input_tokens": 1804, "output_tokens": 296, "cost_usd": 0.006568, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "90207e352b95", "seq": 9, "kind": "tool_call", "start_s": 10.4471, "duration_s": 0.0016, "tool": "write_file", "outcome": "executed", "is_error": false}
+{"run_id": "90207e352b95", "seq": 10, "kind": "model_call", "start_s": 10.4487, "duration_s": 1.5129, "input_tokens": 2122, "output_tokens": 57, "cost_usd": 0.004814, "stop": "end", "tool_requests": 0}

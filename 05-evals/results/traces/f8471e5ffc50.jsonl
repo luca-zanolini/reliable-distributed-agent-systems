@@ -1,0 +1,13 @@
+{"run_id": "f8471e5ffc50", "seq": 0, "kind": "model_call", "start_s": 0.0018, "duration_s": 1.6407, "input_tokens": 1155, "output_tokens": 65, "cost_usd": 0.00296, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "f8471e5ffc50", "seq": 1, "kind": "tool_call", "start_s": 1.6424, "duration_s": 0.0008, "tool": "read_file", "outcome": "executed", "is_error": false}
+{"run_id": "f8471e5ffc50", "seq": 2, "kind": "model_call", "start_s": 1.6433, "duration_s": 1.6435, "input_tokens": 1391, "output_tokens": 86, "cost_usd": 0.003642, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "f8471e5ffc50", "seq": 3, "kind": "tool_call", "start_s": 3.2868, "duration_s": 0.0024, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "f8471e5ffc50", "seq": 4, "kind": "model_call", "start_s": 3.2892, "duration_s": 1.6565, "input_tokens": 1490, "output_tokens": 62, "cost_usd": 0.0036, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "f8471e5ffc50", "seq": 5, "kind": "tool_call", "start_s": 4.9457, "duration_s": 0.0014, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "f8471e5ffc50", "seq": 6, "kind": "model_call", "start_s": 4.9471, "duration_s": 2.1855, "input_tokens": 1674, "output_tokens": 118, "cost_usd": 0.004528, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "f8471e5ffc50", "seq": 7, "kind": "tool_call", "start_s": 7.1326, "duration_s": 0.0012, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "f8471e5ffc50", "seq": 8, "kind": "model_call", "start_s": 7.1339, "duration_s": 2.6323, "input_tokens": 1804, "output_tokens": 167, "cost_usd": 0.005278, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "f8471e5ffc50", "seq": 9, "kind": "tool_call", "start_s": 9.7663, "duration_s": 0.0012, "tool": "read_file", "outcome": "executed", "is_error": false}
+{"run_id": "f8471e5ffc50", "seq": 10, "kind": "model_call", "start_s": 9.7675, "duration_s": 3.0937, "input_tokens": 1998, "output_tokens": 291, "cost_usd": 0.006906, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "f8471e5ffc50", "seq": 11, "kind": "tool_call", "start_s": 12.8612, "duration_s": 0.0015, "tool": "write_file", "outcome": "executed", "is_error": false}
+{"run_id": "f8471e5ffc50", "seq": 12, "kind": "model_call", "start_s": 12.8627, "duration_s": 1.6337, "input_tokens": 2311, "output_tokens": 72, "cost_usd": 0.005342, "stop": "end", "tool_requests": 0}

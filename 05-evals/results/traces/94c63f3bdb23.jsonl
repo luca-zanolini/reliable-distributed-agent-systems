@@ -1,0 +1,5 @@
+{"run_id": "94c63f3bdb23", "seq": 0, "kind": "model_call", "start_s": 0.002, "duration_s": 1.9379, "input_tokens": 922, "output_tokens": 57, "cost_usd": 0.006035, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "94c63f3bdb23", "seq": 1, "kind": "tool_call", "start_s": 1.9399, "duration_s": 0.0006, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "94c63f3bdb23", "seq": 2, "kind": "model_call", "start_s": 1.9406, "duration_s": 1.4877, "input_tokens": 1068, "output_tokens": 66, "cost_usd": 0.00699, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "94c63f3bdb23", "seq": 3, "kind": "tool_call", "start_s": 3.4283, "duration_s": 0.0011, "tool": "read_file", "outcome": "executed", "is_error": false}
+{"run_id": "94c63f3bdb23", "seq": 4, "kind": "model_call", "start_s": 3.4294, "duration_s": 1.1393, "input_tokens": 1218, "output_tokens": 11, "cost_usd": 0.006365, "stop": "end", "tool_requests": 0}

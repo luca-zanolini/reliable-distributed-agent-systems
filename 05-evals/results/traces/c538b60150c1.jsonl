@@ -1,0 +1,8 @@
+{"run_id": "c538b60150c1", "seq": 0, "kind": "model_call", "start_s": 0.0021, "duration_s": 1.5378, "input_tokens": 1091, "output_tokens": 54, "cost_usd": 0.006805, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "c538b60150c1", "seq": 1, "kind": "tool_call", "start_s": 1.5399, "duration_s": 0.0011, "tool": "read_file", "outcome": "executed", "is_error": false}
+{"run_id": "c538b60150c1", "seq": 2, "kind": "model_call", "start_s": 1.5411, "duration_s": 2.2696, "input_tokens": 1327, "output_tokens": 120, "cost_usd": 0.009635, "stop": "tool_use", "tool_requests": 2}
+{"run_id": "c538b60150c1", "seq": 3, "kind": "tool_call", "start_s": 3.8107, "duration_s": 0.001, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "c538b60150c1", "seq": 4, "kind": "tool_call", "start_s": 3.8117, "duration_s": 0.0008, "tool": "search", "outcome": "executed", "is_error": false}
+{"run_id": "c538b60150c1", "seq": 5, "kind": "model_call", "start_s": 3.8125, "duration_s": 3.5337, "input_tokens": 1678, "output_tokens": 282, "cost_usd": 0.01544, "stop": "tool_use", "tool_requests": 1}
+{"run_id": "c538b60150c1", "seq": 6, "kind": "tool_call", "start_s": 7.3462, "duration_s": 0.0021, "tool": "write_file", "outcome": "executed", "is_error": false}
+{"run_id": "c538b60150c1", "seq": 7, "kind": "model_call", "start_s": 7.3483, "duration_s": 2.3185, "input_tokens": 1982, "output_tokens": 61, "cost_usd": 0.011435, "stop": "end", "tool_requests": 0}
