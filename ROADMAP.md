@@ -85,7 +85,7 @@ Useful work without ambient authority.
   exfiltration path — and the capability policy closes it. Every external input is
   treated as untrusted.
 
-## Stage 5 — Evals, Verification, Observability *(weeks 10–11)*
+## Stage 5 — Evals, Verification, Observability *(complete)*
 
 No more judging the system by vibes.
 
