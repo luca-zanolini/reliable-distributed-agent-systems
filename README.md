@@ -27,6 +27,10 @@ where an agent's claims become the system's facts, by evidence rather than asser
 | 5 — [Evals and observability](05-evals/) | done | Task suite with evidence-based validators, per-run records with configuration hashes and provenance, span traces, regrading, regression reports. First comparison: claude-sonnet-5 matched claude-opus-4-8 on the suite at half the cost (30 runs). |
 | 6 — Multi-agent, one machine | next | Planner / builder / reviewer; naive coordination failures exposed before they are fixed. |
 
+**Theory companion:** [docs/theory](docs/theory/) states the concepts behind each stage
+(definitions, propositions with proofs, common misconceptions) and connects them to the
+code and to the literature. It grows with every stage.
+
 ## The staircase
 
 The repository grows toward a capstone — a multi-agent system given a bounded
