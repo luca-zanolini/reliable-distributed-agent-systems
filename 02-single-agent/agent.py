@@ -85,8 +85,9 @@ def _run_with_timeout(fn, timeout_s: float):
 
 class Agent:
     def __init__(self, provider, workspace: Workspace, tools: list[Tool],
-                 budget: Budget = Budget(), verbose: bool = False):
+                 budget: Budget = Budget(), verbose: bool = False, system: str = SYSTEM):
         self.provider = provider
+        self.system = system
         self.ws = workspace
         self.tools = {t.name: t for t in tools}
         self.specs = [ToolSpec(t.name, t.description, t.args.model_json_schema()) for t in tools]
@@ -111,7 +112,7 @@ class Agent:
                 return RunResult("cost_budget", None, step - 1, spent, events)
 
             try:
-                c = self.provider.step(history, system=SYSTEM, tools=self.specs)
+                c = self.provider.step(history, system=self.system, tools=self.specs)
             except OutputError as e:
                 spent += e.completion.cost_usd
                 log("model", f"step {step}: unusable output ({e})")

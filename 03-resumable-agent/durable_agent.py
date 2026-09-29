@@ -34,7 +34,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "02-single-agent"))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "01-llm-runtime"))
-from agent import SYSTEM, Agent, Budget, Event, RunResult  # noqa: E402
+from agent import Agent, Budget, Event, RunResult  # noqa: E402
 from journal import Journal  # noqa: E402
 from llm import (  # noqa: E402
     AssistantTurn, LLMError, OutputError, RequestError, ToolCall, ToolResult,
@@ -137,7 +137,7 @@ class DurableAgent(Agent):
                 return self._finish(st, "cost_budget", None, events)
 
             try:
-                c = self.provider.step(st.history, system=SYSTEM, tools=self.specs)
+                c = self.provider.step(st.history, system=self.system, tools=self.specs)
             except OutputError as e:
                 self._commit(st, {"type": "model_failed", "cost": e.completion.cost_usd})
                 log("model", f"unusable output ({e})")
