@@ -73,7 +73,7 @@ From toy loop to resumable system.
   run is classified: safe to replay, or requiring idempotency / a durable record
   before retry. (Write-ahead logging and state-machine recovery, wearing new clothes.)
 
-## Stage 4 — Tools, MCP, Sandboxes, Capability Security *(weeks 8–9)*
+## Stage 4 — Tools, MCP, Sandboxes, Capability Security *(mechanisms complete; threat model pending)*
 
 Useful work without ambient authority.
 

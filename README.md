@@ -23,7 +23,8 @@ where an agent's claims become the system's facts, by evidence rather than asser
 | 1 — [LLM runtime](01-llm-runtime/) | done | Provider-neutral adapter with a receipt per call and a three-way failure taxonomy; free-form vs structured output measured (N=30 per arm: 2.4× cheaper, 1 distinct answer in 30). |
 | 2 — [Single agent](02-single-agent/) | done | Framework-free agent loop; a six-step gate on every tool request; a 20-case failure suite (escapes, injection, hangs, runaway loops, partial writes). |
 | 3 — [Resumable agent](03-resumable-agent/) | done | Write-ahead journal; state rebuilt by replay; recovery by effect class (re-run / same idempotency key / never retry). Killed mid-action: naive restart duplicates every effect, durable resume performs each once. |
-| 4 — Tools, sandboxes, capability security | next | Real isolation, least privilege, prompt injection. |
+| 4 — [Capability security](04-capability-security/) | mechanisms done; threat model pending | Per-role capability manifests (allow / ask / deny, default deny, secret paths, permitted destinations); tools in a separate MCP-style process with no inherited credentials, killed on timeout; pinned tool declarations; human approval; audit log. |
+| 5 — Evals, verification, observability | next | Repeatable suites; claims vs evidence. |
 
 ## The staircase
 
