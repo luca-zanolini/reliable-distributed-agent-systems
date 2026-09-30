@@ -14,10 +14,14 @@ than the noise?**
 
 ## Definitions
 
+> **Intuition.** An exam question: the starting situation, the instruction, the tools allowed, and the answer key, all written before anyone sits the exam.
+
 **Definition 5.1 (Task).** A task is a tuple $(e_0, q, T_q, V)$: an initial
 environment (the fixture), an objective, the tools available, and a **validator**
 $V : \mathit{Answer} \times E \to \{0, 1\}$ applied to the final answer and the final
 environment.
+
+> **Intuition.** A validator that reads only what the agent says grades the claim; one that inspects the result grades the work. When the task is to change something, only the second can tell you it was changed.
 
 **Definition 5.2 (Evidence and claims).** A validator is *claim-based* if it depends
 only on the answer, and *evidence-based* if it depends on the final environment. When a
@@ -26,10 +30,14 @@ validator can establish it: a claim-based one grades what the agent *says*. Exec
 the repository's tests after the agent's change, as in SWE-bench [Jim24], is an
 evidence-based validator.
 
+> **Intuition.** The answer key can be wrong as well: it can pass work that is actually wrong (a false positive) or fail work that is actually right (a false negative).
+
 **Definition 5.3 (Validator error).** Let $G$ be the ground truth ("the task was
 actually accomplished"). A *false positive* is $V = 1 \wedge G = 0$; a *false
 negative* is $V = 0 \wedge G = 1$. A validator is itself a program and has an error
 profile to be tested.
+
+> **Intuition.** If each attempt succeeds with the same probability, there are two different questions about k attempts: does at least one succeed (pass@k), and do all of them succeed (pass^k)?
 
 **Definition 5.4 (Success probability and its aggregates).** Model repeated runs of a
 task under a fixed configuration as independent Bernoulli trials with success
@@ -37,6 +45,8 @@ probability $p$. Then
 $\mathrm{pass@}k = 1 - (1-p)^k$, the probability that at least one of $k$ runs
 succeeds [Che21], and
 $\mathrm{pass}^k = p^k$, the probability that all $k$ succeed [Yao25].
+
+> **Intuition.** To compare results you must know exactly what produced them: which model, prompt and budgets (the configuration), what happened in each run (the record), and which version of the code ran it (the provenance).
 
 **Definition 5.5 (Configuration, record, provenance).** A *configuration* is everything
 that determines the agent's behaviour except randomness: model, system prompt, tools,
@@ -46,11 +56,15 @@ is the identity of the code that produced the record. Reporting several metrics 
 configuration (correctness, cost, latency, tool use) rather than a single score follows
 holistic evaluation practice [Lia23].
 
+> **Intuition.** A proctor's timed log of each run: every model call and every tool call, with when it started, how long it took and what it cost, all tagged with the run's identity.
+
 **Definition 5.6 (Trace).** A trace is a sequence of *spans*, each a timed interval
 labelled with an operation (a model call, a tool call) and attributes, all sharing a run
 identifier, in the manner of distributed tracing systems [Sig10].
 
 ## Results
+
+> **Intuition.** Trying more times makes "at least once" ever more likely and "every time" ever less likely. An agent that is good at the first can still be poor at the second, and an agent that acts needs the second.
 
 **Proposition 5.1 (Capability versus reliability).** For $k \ge 1$ and
 $0 \le p \le 1$: $\;p^k \le p \le 1-(1-p)^k$, with strict inequalities when
@@ -66,6 +80,8 @@ the successful attempt. $\mathrm{pass}^k$ answers "does it do this every time?",
 relevant question for an agent that acts: a 90% agent passes ten consecutive runs with
 probability $0.9^{10} \approx 0.35$.
 
+> **Intuition.** With only 15 attempts, the plausible range for the true success rate is wide. The ranges for 14 out of 15 and 15 out of 15 overlap, so neither result shows the other to be worse.
+
 **Proposition 5.2 (Small samples do not separate high pass rates).** With $n$ runs and
 $x$ successes, the Wilson score interval [Wil27] at 95% confidence is
 $\dfrac{\hat p + \frac{z^2}{2n} \pm z\sqrt{\frac{\hat p(1-\hat p)}{n} + \frac{z^2}{4n^2}}}{1 + \frac{z^2}{n}}$
@@ -77,11 +93,15 @@ The interval is preferred to $\hat p \pm z\sqrt{\hat p(1-\hat p)/n}$, which dege
 to a single point at $\hat p = 1$. For comparing two configurations on the same tasks,
 paired analyses and clustered standard errors are appropriate [Mil24] (preprint).
 
+> **Intuition.** If the answer key reads only the written answer, old answer sheets can be re-marked with a new key and give exactly what the new key would have said. Asking the candidate to sit again would change the answers as well as the key.
+
 **Remark 5.3 (Why regrading is sound and re-running is not the same).** If a validator
 depends only on the answer, applying a new validator to stored answers yields exactly
 the verdicts the new validator would have given on those runs. Re-running would instead
 draw new samples and change two things at once. Evidence-based validators cannot be
 regraded from the answer alone unless the final artifacts are kept.
+
+> **Intuition.** Using a model as the examiner allows grading open-ended answers, but that examiner is itself random and has known biases. Prefer a fixed answer key whenever one exists.
 
 **Remark 5.4 (Model-based grading).** Using a language model as the validator extends
 evaluation to open-ended answers, at the cost of a grader that is itself stochastic and

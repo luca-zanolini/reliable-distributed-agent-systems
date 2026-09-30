@@ -16,16 +16,22 @@ does not?"**, and the answer is: exactly what the badge allows.
 
 ## Definitions
 
+> **Intuition.** Authority is what you are able to cause. A capability is like a key: holding it is what lets you open that particular door, and nothing else does.
+
 **Definition 4.1 (Principals, authority, capabilities).** A *principal* is an entity
 on whose behalf requests are made; its *authority* is the set of operations it can
 cause. A *capability* is an unforgeable token that designates an object and the
 operations permitted on it; holding it is both necessary and sufficient to perform
 them [DV66].
 
+> **Intuition.** Three old rules of secure design: give each party only what its job needs; check every access, every time; and when in doubt, say no.
+
 **Definition 4.2 (Design principles).** From [SS75]: *least privilege*, every
 principal operates with the least authority its task requires; *complete mediation*,
 every access to every object is checked (Definition 2.6); *fail-safe defaults*, access
 is denied unless explicitly granted.
+
+> **Intuition.** A deputy holds powers for their own job. If a stranger can talk the deputy into using those powers for the stranger's purpose, the deputy is confused: nobody broke in, yet the stranger obtained what they could not have taken themselves.
 
 **Definition 4.3 (Confused deputy).** A program acting with authority it holds for one
 purpose, on behalf of a party that lacks that authority, is a *confused deputy* when
@@ -33,12 +39,16 @@ it can be induced to use the authority for the other party's purpose [Har88]. An
 that reads untrusted content is a deputy by construction: it holds its principal's
 authority and processes text written by others.
 
+> **Intuition.** The model reads everything as text and cannot reliably tell instructions it should follow from content it should merely process. Text that smuggles in instructions is a prompt injection; it is indirect when it arrives inside something the agent retrieved.
+
 **Definition 4.4 (Prompt injection).** Text that the model receives as data but acts
 upon as instruction. It is *direct* when supplied by the user and *indirect* when it
 arrives through content the agent retrieves (documents, web pages, tool outputs)
 [Gre23]. Benchmarks measure how often agents act on injected instructions
 [Deb24, Zha24]; the reported rates are substantial for undefended agents, which is why
 this chapter bounds the consequences at the runtime rather than relying on the model.
+
+> **Intuition.** Each role carries a badge: what it may do freely, what needs a person's signature, and, by default, everything else it may not do. Its effective authority is everything the badge does not forbid.
 
 **Definition 4.5 (Capability manifest).** For a role $\rho$, a policy
 $\mathrm{Pol}_\rho$ maps each request $r$ (in the current state) to
@@ -48,6 +58,8 @@ $A(\rho) = \{ r : \mathrm{Pol}_\rho(r) \ne \mathsf{deny} \}$. A request judged
 $\mathsf{ask}$ executes only with the approval of a human approver $\alpha$, and is
 denied when no approver is available.
 
+> **Intuition.** The model reads a tool's description as instructions. So record a fingerprint of the description when it is reviewed, and stop showing the tool if the description ever changes.
+
 **Definition 4.6 (Declaration pinning).** A tool's *declaration* is the text the model
 is shown about it: name, description and argument schema. Its *pin* is
 $H(\mathrm{declaration})$ for a collision-resistant hash $H$, recorded when the tool is
@@ -55,6 +67,8 @@ reviewed. A tool is advertised to the model only if its current declaration hash
 its pin.
 
 ## Results
+
+> **Intuition.** Whatever the model is told and however it behaves, only actions the badge allows, or a person approves, can happen. The damage a confused agent can do is bounded by its badge.
 
 **Proposition 4.1 (The blast radius is the grant).** Under complete mediation, for
 every model and every content the agent reads, every request executed in a run of role
@@ -66,10 +80,14 @@ environment only through requests, and every request is executed only after
 $\mathrm{Pol}_\rho$ and, for $\mathsf{ask}$, the approver, have permitted it. No step
 depends on the content that led the model to make the request. $\square$
 
+> **Intuition.** Injection changes what the agent asks for. It cannot change what the gate lets through. So the security question becomes: how small can the badge be?
+
 **Corollary 4.2 (Injection is bounded, not prevented).** Prompt injection can change
 *which* requests are made. It cannot change *which requests can succeed*. The security
 of a tool-using agent therefore reduces to choosing $A(\rho)$, the approver, and the
 trusted base that enforces them.
+
+> **Intuition.** The gate judges each action on its own and does not see how information obtained by one action could leave through another. A classic result says a program that holds secrets and can communicate with the outside cannot in general be guaranteed to keep them. The practical rule: do not give one role both.
 
 **Remark 4.3 (Per-request authorization and information flow).** $\mathrm{Pol}_\rho$
 judges each request in isolation; it does not track how information moves *between*
@@ -81,6 +99,8 @@ influence, unless an additional mechanism controls the flow of data between the 
 Recent work enforces such flows with capabilities attached to data values [Deb25]
 (preprint).
 
+> **Intuition.** If the fingerprint changes whenever the text changes, then any edit to a tool's description, however small, gets the tool withheld until someone reviews it again.
+
 **Proposition 4.4 (Changed tools are not trusted).** If $H$ is collision-resistant, any
 change to a tool's declaration causes the tool to be withheld from the model until it
 is re-pinned.
@@ -91,6 +111,8 @@ Declarations matter because the model reads them as instructions about how to us
 tool; an altered description is a channel into the model's context. Pinning protects
 the declaration, not the implementation: what a tool *does* when invoked remains part of
 the trusted base.
+
+> **Intuition.** Running tools in a separate process with an empty environment keeps the host's secrets out of reach and lets the runtime stop a stuck tool. It is a separate room, not a locked building.
 
 **Remark 4.5 (Isolation of the executor).** Running tools in a separate process with an
 empty environment removes the host's credentials from the tools' address space, and

@@ -18,10 +18,14 @@ decides what happens.
 
 ## Definitions
 
+> **Intuition.** Four parts: an untrusted oracle that proposes, a trusted program that decides and keeps the records, a set of actions, and the world those actions touch. The oracle lives outside the program and is reached only by calling it.
+
 **Definition 2.1 (System).** An agent system consists of a model $M$ (Chapter 1),
 treated as untrusted; a **runtime** $R$, a deterministic program treated as trusted;
 a set of tools $T$; and an environment with state space $E$ (files, services). The
 model is outside the runtime: the runtime reaches it only through model calls.
+
+> **Intuition.** A tool is an action with a name, a form to fill in, an effect on the world, and a list of the things it may touch. The last item is what makes it checkable.
 
 **Definition 2.2 (Tool).** A tool $t$ has a name, an argument schema
 $\Sigma_t$ (the admissible arguments), an effect
@@ -29,9 +33,13 @@ $f_t : E \times \Sigma_t \to E \times \mathit{Out}$, and a footprint
 $\mathit{fp}_t : \Sigma_t \to 2^{\mathit{Res}}$, the set of resources an invocation
 may read or modify.
 
+> **Intuition.** When the model "uses a tool", it only writes down a wish. Writing a wish changes nothing.
+
 **Definition 2.3 (Request).** A tool request is a triple
 $r = (\mathit{id}, \mathit{name}, \mathit{args})$ appearing in model output. It is a
 syntactic object: producing it has no effect on $E$.
+
+> **Intuition.** Every wish goes to a checkpoint that either lets it through or turns it back with a reason. Either way, the model receives exactly one reply per wish, labelled with the wish it answers.
 
 **Definition 2.4 (Gate).** The runtime's gate maps each request to
 $\mathsf{permit}$ or $\mathsf{refuse}(\mathit{reason})$, from the request and the
@@ -39,6 +47,8 @@ runtime's own state. A permitted request is executed, $f_t$ is applied, and its
 output (bounded in time and size) becomes the result; a refused request is not
 executed and the result is the reason. **Either way, exactly one result, carrying the
 request's $\mathit{id}$, is returned to the model.**
+
+> **Intuition.** The loop spelled out: check the money, ask the model, stop if it answered, otherwise pass each request through the gate and add everything to the history. Stop also when the steps or the money run out, or when the model cannot be reached.
 
 **Definition 2.5 (Run).** Given an objective $q$, step budget $N$ and cost budget
 $B$: let $h_0 = \langle q \rangle$ and $\mathit{spent} = 0$. For
@@ -52,12 +62,16 @@ end with $\mathsf{step\_budget}$. This interleaving of model reasoning and tool
 actions is the ReAct pattern [Yao23]; tool use by language models is studied in
 [Sch23].
 
+> **Intuition.** Nothing touches the world except through the checkpoint. There is no side door.
+
 **Definition 2.6 (Complete mediation).** A runtime satisfies complete mediation if
 every change to $E$ during a run is the effect $f_t$ of a request the gate permitted
 [SS75]. A mechanism that mediates every access, cannot be bypassed and is small
 enough to verify is a *reference monitor* [And72]; the gate is one.
 
 ## Results
+
+> **Intuition.** If the only door to the world is the checkpoint, and the checkpoint only admits actions that stay inside the workspace, then nothing outside the workspace is ever touched, however badly or maliciously the model behaves.
 
 **Theorem 2.1 (Confinement against arbitrary model output).** Suppose (i) complete
 mediation holds, (ii) the gate permits a request only if
@@ -77,6 +91,8 @@ worst case of distributed computing's Byzantine fault model applied to a single
 untrusted proposer. It rests entirely on the runtime, which is the trusted computing
 base.
 
+> **Intuition.** The loop has a fixed number of laps and checks the wallet before each one, so it always stops, and it can overspend by at most one call.
+
 **Theorem 2.2 (Termination and bounded spend).** Every run ends after at most $N$
 model calls. If every call costs at most $c_{\max}$, total spend is below
 $B + c_{\max}$.
@@ -90,6 +106,8 @@ Theorem 2.1 is a **safety** property (nothing bad happens) and Theorem 2.2 a
 sense of [Lam77, AS85]. Termination is obtained *without assuming anything about the
 model*: the model may never produce an answer, and the budget still ends the run.
 
+> **Intuition.** A "no" from the checkpoint is just another reply. The only ways out of the loop are an answer, running out of steps or money, or losing the model.
+
 **Proposition 2.3 (Refusal is not termination).** The terminal outcomes of a run are
 exactly $\mathsf{answered}$, $\mathsf{step\_budget}$, $\mathsf{cost\_budget}$ and
 $\mathsf{aborted}$. A refused request never ends a run.
@@ -101,6 +119,8 @@ loop continues. $\square$
 This is deliberate: a refusal is information. The model learns that an action is not
 available and can pursue the objective by permitted means, as a client does after a
 server rejects one request.
+
+> **Intuition.** Every lap re-sends everything said so far, and the pile grows every lap, so the total bill grows like the square of the number of laps.
 
 **Proposition 2.4 (Input cost grows quadratically with run length).** If the initial
 history has $h$ tokens and each step appends at least $\delta$ tokens, the total

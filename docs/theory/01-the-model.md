@@ -18,10 +18,14 @@ oracle is **stateless**, **stochastic**, and **indifferent to completeness**.
 Let $V$ be a finite vocabulary of tokens, $V^*$ the finite sequences over $V$, and
 $\Delta(X)$ the probability distributions over a set $X$.
 
+> **Intuition.** At its core a model does one thing: given the text so far, it gives the odds for what the next piece of text should be. Everything else is built on that.
+
 **Definition 1.1 (Language model).** A language model is a map
 $\pi : V^* \to \Delta(V \cup \{\mathsf{eos}\})$ assigning to every prefix a
 distribution over the next token or end-of-sequence. Modern instances are
 Transformer networks [Vas17]; nothing below depends on the architecture.
+
+> **Intuition.** To produce an answer, the model repeatedly draws the next piece from those odds and appends it, until it draws "stop" or hits a length limit. Which of the two happened is recorded, because a finished answer and a cut-off one otherwise look alike.
 
 **Definition 1.2 (Generation).** Given an input $x \in V^*$ and a cap $m$, generation
 samples $y_1, y_2, \ldots$ with $y_i \sim \pi(x \cdot y_{<i})$ until $\mathsf{eos}$
@@ -31,6 +35,8 @@ cap was reached. Sampling procedures (temperature, nucleus sampling [Hol20]) are
 transformations of $\pi$ applied before drawing; current production models may not
 expose them.
 
+> **Intuition.** From the outside, a call is: send text, get text back, plus a receipt of how many pieces went in and came out. The receipt is what you pay for, and output pieces cost more than input ones.
+
 **Definition 1.3 (Model call).** A model call is a randomized procedure
 $\mathsf{Call}(x) = (y, s, u)$ where $(y,s)$ is a generation and
 $u = (u_{\mathrm{in}}, u_{\mathrm{out}})$ is a *receipt*: the number of input and
@@ -38,10 +44,14 @@ output tokens. With per-token prices $\alpha, \beta$, its cost is
 $c(u) = \alpha\, u_{\mathrm{in}} + \beta\, u_{\mathrm{out}}$. On current models
 $\beta / \alpha = 5$.
 
+> **Intuition.** The oracle has no memory: what it answers now depends only on the sheet you slide under the glass now, never on anything slid under it before.
+
 **Definition 1.4 (Statelessness).** Calls are stateless if, for any sequence of
 calls with inputs $x_1, \ldots, x_n$, the $n$-th output is independent of all earlier
 inputs and outputs given $x_n$:
 $\Pr[\mathsf{Call}(x_n) \mid x_1, o_1, \ldots, x_{n-1}, o_{n-1}] = \Pr[\mathsf{Call}(x_n)]$.
+
+> **Intuition.** To force a shape, such as valid JSON, block every next piece that could not lead to a valid result, and allow "stop" only when the result is complete. The model still chooses, but only among moves that preserve the shape.
 
 **Definition 1.5 (Constrained decoding).** Let $L \subseteq V^*$ be a language (for
 example, the serializations of a JSON Schema) and $\mathrm{Pref}(L)$ its set of
@@ -51,6 +61,8 @@ $y \in L$, and renormalizes [Gen23, WL23].
 
 ## Results
 
+> **Intuition.** If the model has no memory, a conversation can exist only because the application keeps it and sends it again. What the model "remembers" is exactly what the application puts back on the sheet.
+
 **Proposition 1.1 (Conversation state is client state).** Let an application build
 the input of its $t$-th call as $x_t = \mathrm{Enc}(h_{t-1}, q_t)$ from its own
 history $h_{t-1}$ and a new query $q_t$. Under statelessness, the distribution of the
@@ -59,15 +71,25 @@ $t$-th reply depends on the past only through $x_t$.
 *Proof.* Immediate from Definition 1.4: conditioning on earlier inputs and outputs
 does not change the distribution of $\mathsf{Call}(x_t)$. $\square$
 
+> **Intuition.** Leave the earlier exchanges off the sheet, and the model is meeting you for the first time.
+
 **Corollary 1.2 (Amnesia).** If $x_t$ omits earlier exchanges, the reply is
-distributed as in a fresh conversation. **Corollary 1.3 (Roles are labels).** Two
+distributed as in a fresh conversation.
+
+> **Intuition.** The model cannot tell a real past from a written-down one: write "you said X" on the sheet and it will take it that it said X. Trust must live with whoever assembles the sheet.
+
+**Corollary 1.3 (Roles are labels).** Two
 histories with the same encoding are indistinguishable to the model: a fabricated
 "assistant" turn is treated exactly like a genuine one. Whatever trust a conversation
 carries lives in the application that assembled it, not in the transcript.
 
+> **Intuition.** How much you send depends only on what you send; all the randomness is in the reply. So input cost is predictable and output cost is not.
+
 **Proposition 1.4 (Input size is deterministic).** $u_{\mathrm{in}}$ is a function
 of $x$ alone. *Proof.* Tokenization is a deterministic function of the input. $\square$
 All variability in size and cost is therefore on the output side.
+
+> **Intuition.** If generation may only take shape-preserving steps and may only stop at a complete result, then every finished result has the right shape. The guarantee covers finished results only.
 
 **Proposition 1.5 (Soundness of constrained decoding).** If constrained generation
 returns with $s = \mathsf{end}$, then $y \in L$.
@@ -82,6 +104,8 @@ of a valid one and **not** itself valid, so truncation must be rejected, not par
 Second, membership in $L$ is **syntactic**: every element of $L$ with positive
 probability may be produced, including false ones. A schema constrains the *shape*
 of an answer, never its *truth*; truth needs a verifier (Chapter 5).
+
+> **Intuition.** A response can arrive perfectly from the network's point of view and still be cut off mid-sentence. Arrival and completeness are different questions.
 
 **Remark 1.6 (Completeness is not transport success).** A call can succeed at every
 layer of transport (the protocol reports success) and still return
