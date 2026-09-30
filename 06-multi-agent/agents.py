@@ -26,31 +26,41 @@ def planner(board: Board) -> Agent:
         yield f"planner      adds {task_id} ({description})"
 
 
-def implementer(name: str, board: Board, followup: Callable[[str], str] | None = None) -> Agent:
+def implementer(name: str, board: Board, followup: Callable[[str], str] | None = None,
+                retry_write: bool = False) -> Agent:
+    """Take open tasks until none is left. Options model two realistic behaviours:
+    `retry_write` repeats a write whose acknowledgement it did not see, and
+    `followup` makes one more edit after finishing all tasks."""
     repo = board.repo
-    open_now = board.open_tasks()
-    yield f"{name:<12} reads board: open {[t.id for t in open_now]}"
-    if not open_now:
-        return
-    task = open_now[0]                                  # acts on what it read, however old
+    while True:
+        open_now = board.open_tasks()
+        yield f"{name:<12} reads board: open {[t.id for t in open_now]}"
+        if not open_now:
+            break
+        task = open_now[0]                              # acts on what it read, however old
 
-    board.claim(task.id, name)
-    yield f"{name:<12} claims {task.id}"
+        board.claim(task.id, name)
+        yield f"{name:<12} claims {task.id}"
 
-    base = repo.head
-    text = repo.read(task.file)
-    yield f"{name:<12} reads {task.file} @ {base}"
+        base = repo.head
+        text = repo.read(task.file)
+        yield f"{name:<12} reads {task.file} @ {base}"
 
-    new = repo.write_files({task.file: FIXES[task.id](text),       # built from the read above
-                            "CHANGELOG.md": repo.read("CHANGELOG.md") + f"- {task.id} fixed by {name}\n"},
-                           name, f"fix {task.id}")
-    yield f"{name:<12} writes fix for {task.id} -> {new}"
+        def write():                                    # the fix is built from the read above
+            return repo.write_files({task.file: FIXES[task.id](text),
+                                     "CHANGELOG.md": repo.read("CHANGELOG.md") + f"- {task.id} fixed by {name}\n"},
+                                    name, f"fix {task.id}")
+        new = write()
+        yield f"{name:<12} writes fix for {task.id} -> {new}"
+        if retry_write:
+            new = write()
+            yield f"{name:<12} sees no acknowledgement, writes {task.id} again -> {new}"
 
-    board.complete(task.id, name, base, new)
-    yield f"{name:<12} marks {task.id} done"
+        board.complete(task.id, name, base, new)
+        yield f"{name:<12} marks {task.id} done"
 
     if followup:
-        v = repo.write(task.file, followup(repo.read(task.file)), name, "follow-up edit")
+        v = repo.write("src/lib.rs", followup(repo.read("src/lib.rs")), name, "follow-up edit")
         yield f"{name:<12} makes a follow-up edit -> {v}"
 
 

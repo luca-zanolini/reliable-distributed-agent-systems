@@ -18,8 +18,9 @@ SERIAL = ["planner*", "impl-1*", "impl-2*", "tester*", "reviewer*", "coordinator
 
 class Serial(unittest.TestCase):
     def test_serial_execution_is_correct(self):
+        from scenarios import CORRECT                     # concurrent, but conflict-free
         board = Board(Repo(INITIAL))
-        run(team(board), SERIAL)
+        run(team(board), CORRECT)
         head = board.repo.head
         self.assertEqual(board.accepted, head)
         self.assertEqual(run_tests(board.repo.files(head))[1], [])            # accepted version passes
@@ -33,6 +34,12 @@ class Serial(unittest.TestCase):
             board = Board(Repo(INITIAL))
             return run(team(board), schedule), board.repo.head
         self.assertEqual(once(SERIAL), once(SERIAL))
+
+    def test_a_lone_implementer_takes_every_open_task(self):
+        board = Board(Repo(INITIAL))
+        run(team(board), SERIAL)
+        self.assertEqual({t.id: t.owner for t in board.tasks.values()}, {"T1": "impl-1", "T2": "impl-1"})
+        self.assertEqual(board.accepted, board.repo.head)
 
     def test_one_step_at_a_time(self):
         board = Board(Repo(INITIAL))
