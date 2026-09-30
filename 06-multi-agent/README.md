@@ -14,7 +14,7 @@ flowchart TB
     I["<b>impl-1, impl-2</b><br/>fix a task each"]
     T["<b>tester</b><br/>a program"]
     R["<b>reviewer</b>"]
-    B[("<b>board.py</b> · coordinator<br/>tasks · reports · reviews")]
+    B[("<b>coordinator.py</b> · the board<br/>tasks · reports · reviews")]
     A["<b>accept()</b><br/>accepts the head, naively"]
     REPO[("<b>repo.py</b><br/>versions named by content hash")]
     P -->|add tasks| B
@@ -32,8 +32,8 @@ flowchart TB
 |---|---|
 | `repo.py` | Content-addressed repository: each version is named by the SHA-256 of its contents; history is immutable; writes are naive (applied to the current head, whatever the writer read). |
 | `software.py` | The task: one Rust file with two independent bugs, a changelog, and a deterministic test suite. |
-| `board.py` | The coordinator's board: tasks, test reports, reviews, acceptance. Naive: no ownership checks, no version checks, held in memory. Every action is recorded with its version. |
-| `agents.py` | Scripted planner, implementers, tester, reviewer and coordinator, each a generator pausing after every action on shared state; a deterministic scheduler that resumes them in an explicit order. |
+| `coordinator.py` | The coordinator: its state (the board: tasks, test reports, reviews) and its one decision, acceptance. Naive: no ownership checks, no version checks, held in memory; agents call it directly. Every action is recorded with its version. |
+| `agents.py` | Scripted planner, implementers, tester and reviewer, plus the coordinator's sign-off turn, each a generator pausing after every action on shared state; a deterministic scheduler that resumes them in an explicit order. |
 | `scenarios.py` | The correct concurrent baseline and the six failures, each an explicit schedule; a diagnosis that reads the version-tagged record. |
 | `test_*.py` | 18 offline tests: content addressing, the naive board, scheduler determinism, and every failure reproduced on demand. |
 

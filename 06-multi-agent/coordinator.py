@@ -1,4 +1,9 @@
-"""The coordinator's board: the shared task list, test reports, reviews, acceptance.
+"""The coordinator: its state (the board) and its decisions.
+
+The board is the shared record every agent reads and writes: the task list with
+owners, the test reports, the reviews. The coordinator's one decision is
+acceptance. Agents call these methods directly; there is no separate coordinator
+process yet (Stage 7 makes it one, able to check every request before applying it).
 
 Deliberately naive, as the stage requires:
   - claim() assigns an owner without checking the task is still open;
@@ -29,7 +34,9 @@ class Task:
     owner: str | None = None
 
 
-class Board:
+class Coordinator:
+    """Holds the board (tasks, reports, reviews) and decides acceptance. Naive."""
+
     def __init__(self, repo: Repo):
         self.repo = repo
         self.tasks: dict[str, Task] = {}

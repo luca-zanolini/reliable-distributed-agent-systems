@@ -17,19 +17,19 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
 
-from agents import coordinator, implementer, planner, reviewer, run, tester
-from board import Board
+from agents import sign_off, implementer, planner, reviewer, run, tester
+from coordinator import Coordinator
 from repo import Repo
 from software import INITIAL, REGRESSION, run_tests
 
 TASK_TEST = {"T1": "fencing_rejects_stale", "T2": "grant_increments"}
 
 
-def team(board: Board, impl1: dict | None = None, impl2: dict | None = None) -> dict:
-    return {"planner": planner(board),
-            "impl-1": implementer("impl-1", board, **(impl1 or {})),
-            "impl-2": implementer("impl-2", board, **(impl2 or {})),
-            "tester": tester(board), "reviewer": reviewer(board), "coordinator": coordinator(board)}
+def team(coord: Coordinator, impl1: dict | None = None, impl2: dict | None = None) -> dict:
+    return {"planner": planner(coord),
+            "impl-1": implementer("impl-1", coord, **(impl1 or {})),
+            "impl-2": implementer("impl-2", coord, **(impl2 or {})),
+            "tester": tester(coord), "reviewer": reviewer(coord), "coordinator": sign_off(coord)}
 
 
 # The two implementers work concurrently, each on its own task; the second reads
@@ -84,29 +84,29 @@ SCENARIOS = [
 ]
 
 
-def execute(s: Scenario | None) -> tuple[list[str], Board, list[Board]]:
+def execute(s: Scenario | None) -> tuple[list[str], Coordinator, list[Coordinator]]:
     """Run a scenario (None = the correct baseline). Returns timeline, final board, crashed boards."""
     repo = Repo(INITIAL)
-    board = Board(repo)
-    agents = team(board, s.impl1 if s else None, s.impl2 if s else None)
+    coord = Coordinator(repo)
+    agents = team(coord, s.impl1 if s else None, s.impl2 if s else None)
     schedule = s.schedule if s else CORRECT
     crashed = []
     if s and s.crash_after is not None:
         timeline = run(agents, schedule[:s.crash_after])
         timeline.append("*** coordinator crashes: the board is lost; the repository survives ***")
-        crashed.append(board)
-        board = Board(repo)                              # restarted coordinator, empty board
-        agents = team(board)                             # everyone reconnects to it
+        crashed.append(coord)
+        coord = Coordinator(repo)                              # restarted coordinator, empty board
+        agents = team(coord)                             # everyone reconnects to it
         timeline += run(agents, schedule[s.crash_after:])
     else:
         timeline = run(agents, schedule)
-    return timeline, board, crashed
+    return timeline, coord, crashed
 
 
-def diagnose(board: Board, crashed: list[Board] = ()) -> list[str]:
+def diagnose(coord: Coordinator, crashed: list[Coordinator] = ()) -> list[str]:
     """What the version-tagged record shows, whether or not the naive board noticed."""
-    repo, found = board.repo, []
-    events = [e for b in [*crashed, board] for e in b.events]
+    repo, found = coord.repo, []
+    events = [e for b in [*crashed, coord] for e in b.events]
     head_failed = run_tests(repo.files())[1]
 
     for e in events:
@@ -116,20 +116,20 @@ def diagnose(board: Board, crashed: list[Board] = ()) -> list[str]:
     for task, n in sorted(changelog.items()):
         if n > 1:
             found.append(f"{task.lstrip('- ')} was carried out {n} times (duplicate changelog entries)")
-    for t in board.tasks.values():
+    for t in coord.tasks.values():
         if t.status == "done" and TASK_TEST[t.id] in head_failed:
             found.append(f"{t.id} is marked done, but its fix is not in the head (overwritten or reverted after completion)")
     if crashed:
         before = {tid: t.status for b in crashed for tid, t in b.tasks.items()}
         found.append(f"coordinator restart forgot task states {before}; the new board started from scratch")
 
-    if board.accepted:
-        v = board.accepted
-        if not any(r["version"] == v and not r["failed"] for r in board.reports):
-            tested = sorted({r["version"] for r in board.reports})
+    if coord.accepted:
+        v = coord.accepted
+        if not any(r["version"] == v and not r["failed"] for r in coord.reports):
+            tested = sorted({r["version"] for r in coord.reports})
             found.append(f"accepted {v} without a passing test report for it (reports are for {tested})")
-        if not any(r["version"] == v and r["approved"] for r in board.reviews):
-            reviewed = sorted({r["version"] for r in board.reviews})
+        if not any(r["version"] == v and r["approved"] for r in coord.reviews):
+            reviewed = sorted({r["version"] for r in coord.reviews})
             found.append(f"accepted {v} without a review of it (reviews are for {reviewed})")
         failing = run_tests(repo.files(v))[1]
         if failing:
@@ -141,11 +141,11 @@ def diagnose(board: Board, crashed: list[Board] = ()) -> list[str]:
 
 if __name__ == "__main__":
     for s in [None, *SCENARIOS]:
-        timeline, board, crashed = execute(s)
+        timeline, coord, crashed = execute(s)
         title = f"({s.key}) {s.title}" if s else "Baseline: correct concurrent schedule"
         print(f"\n{'=' * 90}\n{title}\n{'=' * 90}")
         print("\n".join("  " + line for line in timeline))
-        found = diagnose(board, crashed)
+        found = diagnose(coord, crashed)
         print("\n  record shows: " + ("no anomaly" if not found else ""))
         for f in found:
             print(f"    - {f}")

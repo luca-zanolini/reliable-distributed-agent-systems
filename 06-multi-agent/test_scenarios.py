@@ -19,14 +19,14 @@ EXPECTED = {       # a fragment of each finding the record must show
 
 class Reproduction(unittest.TestCase):
     def test_baseline_is_clean(self):
-        _, board, crashed = execute(None)
-        self.assertEqual(diagnose(board, crashed), [])
+        _, coord, crashed = execute(None)
+        self.assertEqual(diagnose(coord, crashed), [])
 
     def test_each_failure_reproduces(self):
         for key, fragments in EXPECTED.items():
             with self.subTest(scenario=key):
-                _, board, crashed = execute(BY_KEY[key])
-                found = " | ".join(diagnose(board, crashed))
+                _, coord, crashed = execute(BY_KEY[key])
+                found = " | ".join(diagnose(coord, crashed))
                 for frag in fragments:
                     self.assertIn(frag, found)
 

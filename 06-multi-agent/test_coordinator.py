@@ -1,8 +1,8 @@
-"""The software task and the naive board, in isolation. Run: python -m unittest -v test_board"""
+"""The software task and the naive coordinator, in isolation. Run: python -m unittest -v test_coordinator"""
 
 import unittest
 
-from board import Board
+from coordinator import Coordinator
 from repo import Repo
 from software import FIXES, INITIAL, REGRESSION, run_tests
 
@@ -30,7 +30,7 @@ class Software(unittest.TestCase):
 
 class NaiveBoard(unittest.TestCase):
     def test_claim_does_not_check_ownership(self):
-        b = Board(Repo(INITIAL))
+        b = Coordinator(Repo(INITIAL))
         b.add_task("T1", "src/lib.rs", "")
         b.claim("T1", "impl-1")
         b.claim("T1", "impl-2")                                   # accepted without complaint
@@ -39,7 +39,7 @@ class NaiveBoard(unittest.TestCase):
 
     def test_accept_ignores_which_version_evidence_is_about(self):
         r = Repo(INITIAL)
-        b = Board(r)
+        b = Coordinator(r)
         b.add_task("T1", "src/lib.rs", "")
         b.complete("T1", "impl-1", r.head, r.head)
         b.report("some-other-version", ["x"], [], "tester")

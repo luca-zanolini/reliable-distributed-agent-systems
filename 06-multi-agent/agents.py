@@ -14,32 +14,32 @@ from __future__ import annotations
 
 from typing import Callable, Iterator
 
-from board import Board
+from coordinator import Coordinator
 from software import FIXES, TASKS, run_tests
 
 Agent = Iterator[str]
 
 
-def planner(board: Board) -> Agent:
+def planner(coord: Coordinator) -> Agent:
     for task_id, (file, description) in TASKS.items():
-        board.add_task(task_id, file, description)
+        coord.add_task(task_id, file, description)
         yield f"planner      adds {task_id} ({description})"
 
 
-def implementer(name: str, board: Board, followup: Callable[[str], str] | None = None,
+def implementer(name: str, coord: Coordinator, followup: Callable[[str], str] | None = None,
                 retry_write: bool = False) -> Agent:
     """Take open tasks until none is left. Options model two realistic behaviours:
     `retry_write` repeats a write whose acknowledgement it did not see, and
     `followup` makes one more edit after finishing all tasks."""
-    repo = board.repo
+    repo = coord.repo
     while True:
-        open_now = board.open_tasks()
+        open_now = coord.open_tasks()
         yield f"{name:<12} reads board: open {[t.id for t in open_now]}"
         if not open_now:
             break
         task = open_now[0]                              # acts on what it read, however old
 
-        board.claim(task.id, name)
+        coord.claim(task.id, name)
         yield f"{name:<12} claims {task.id}"
 
         base = repo.head
@@ -56,7 +56,7 @@ def implementer(name: str, board: Board, followup: Callable[[str], str] | None =
             new = write()
             yield f"{name:<12} sees no acknowledgement, writes {task.id} again -> {new}"
 
-        board.complete(task.id, name, base, new)
+        coord.complete(task.id, name, base, new)
         yield f"{name:<12} marks {task.id} done"
 
     if followup:
@@ -64,24 +64,25 @@ def implementer(name: str, board: Board, followup: Callable[[str], str] | None =
         yield f"{name:<12} makes a follow-up edit -> {v}"
 
 
-def tester(board: Board) -> Agent:
-    version = board.repo.head
-    files = board.repo.files(version)
+def tester(coord: Coordinator) -> Agent:
+    version = coord.repo.head
+    files = coord.repo.files(version)
     yield f"tester       checks out {version}"
     passed, failed = run_tests(files)
-    board.report(version, passed, failed, "tester")
+    coord.report(version, passed, failed, "tester")
     yield f"tester       reports {version}: " + ("all tests pass" if not failed else f"FAIL {failed}")
 
 
-def reviewer(board: Board) -> Agent:
-    version = board.repo.head
+def reviewer(coord: Coordinator) -> Agent:
+    version = coord.repo.head
     yield f"reviewer     reads {version}"
-    board.review(version, True, "reviewer")
+    coord.review(version, True, "reviewer")
     yield f"reviewer     approves {version}"
 
 
-def coordinator(board: Board) -> Agent:
-    version = board.accept()
+def sign_off(coord: Coordinator) -> Agent:
+    """The coordinator's turn: decide acceptance."""
+    version = coord.accept()
     yield f"coordinator  " + (f"accepts {version}" if version else "cannot accept: work incomplete or unverified")
 
 

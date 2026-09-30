@@ -177,7 +177,7 @@ architecture [Nii86]; it makes coordination visible, not correct.
 
 - `repo.py`: Definition 6.6; writes are deliberately unconditional, so Proposition 6.3's
   first claim can be observed.
-- `board.py`: ownership and acceptance without the conditions of Propositions 6.2 and 6.5;
+- `coordinator.py`: the board, ownership and acceptance without the conditions of Propositions 6.2 and 6.5;
   every action recorded with its version identifier.
 - `agents.py`: agents as generators pausing after each step, and a scheduler that realizes
   any schedule of Definition 6.2.
