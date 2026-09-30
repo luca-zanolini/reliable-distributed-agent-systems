@@ -96,7 +96,7 @@ No more judging the system by vibes.
   important bugs become regression cases.
 - **Exit:** a model or prompt change is evaluated against the suite, not an anecdote.
 
-## Stage 6 — Multi-Agent Coordination, One Machine *(weeks 12–13)*
+## Stage 6 — Multi-Agent Coordination, One Machine *(complete)*
 
 Planner / implementer / tester / reviewer over a bounded software task, with a
 trusted central coordinator — and the naive failures deliberately left in.

@@ -25,7 +25,8 @@ where an agent's claims become the system's facts, by evidence rather than asser
 | 3 — [Resumable agent](03-resumable-agent/) | done | Write-ahead journal; state rebuilt by replay; recovery by effect class (re-run / same idempotency key / never retry). Killed mid-action: naive restart duplicates every effect, durable resume performs each once. |
 | 4 — [Capability security](04-capability-security/) | mechanisms done; threat model pending | Per-role capability manifests (allow / ask / deny, default deny, secret paths, permitted destinations); tools in a separate MCP-style process with no inherited credentials, killed on timeout; pinned tool declarations; human approval; audit log. |
 | 5 — [Evals and observability](05-evals/) | done | Task suite with evidence-based validators, per-run records with configuration hashes and provenance, span traces, regrading, regression reports. First comparison: claude-sonnet-5 matched claude-opus-4-8 on the suite at half the cost (30 runs). |
-| 6 — Multi-agent, one machine | next | Planner / builder / reviewer; naive coordination failures exposed before they are fixed. |
+| 6 — [Multi-agent, one machine](06-multi-agent/) | done | Planner, two concurrent implementers, a test program, a reviewer and a naive coordinator over a content-addressed repository; six coordination failures reproduced on demand by a deterministic scheduler (five end in a silent acceptance). |
+| 7 — Distributed workers | next | Workers in separate processes and machines; real network boundaries. |
 
 **Theory companion:** [docs/theory](docs/theory/) states the concepts behind each stage
 (definitions, propositions with proofs, common misconceptions) and connects them to the
