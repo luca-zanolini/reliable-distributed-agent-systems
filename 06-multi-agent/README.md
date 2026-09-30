@@ -9,24 +9,21 @@ requirements for the next stages; they are not fixed here.
 ## At a glance
 
 ```mermaid
-flowchart LR
-    subgraph W["Workers"]
-        direction TB
-        P["<b>planner</b> · splits the job into T1, T2"]
-        I["<b>impl-1, impl-2</b> · claim a task, fix it"]
-        T["<b>tester</b> · a program: runs the tests on the head"]
-        R["<b>reviewer</b> · reviews the head"]
-    end
-    subgraph C["Coordinator · trusted, naive"]
-        direction TB
-        B[("<b>board.py</b><br/>tasks · reports(H) · reviews(H)")]
-        A["<b>accept()</b><br/>all done + a pass + an approval<br/>→ accepts whatever is the head"]
-        B --> A
-    end
-    REPO[("<b>repo.py</b><br/>versions named by content hash<br/>H0 → H1 → H2 · head")]
-    W -- "add · claim · mark done<br/>report(H) · review(H)" --> B
-    I -- "read @ H · write new version" --> REPO
-    A -. "reads head" .-> REPO
+flowchart TB
+    P["<b>planner</b><br/>splits the job"]
+    I["<b>impl-1, impl-2</b><br/>fix a task each"]
+    T["<b>tester</b><br/>a program"]
+    R["<b>reviewer</b>"]
+    B[("<b>board.py</b> · coordinator<br/>tasks · reports · reviews")]
+    A["<b>accept()</b><br/>accepts the head, naively"]
+    REPO[("<b>repo.py</b><br/>versions named by content hash")]
+    P -->|add tasks| B
+    I -->|claim, mark done| B
+    T -->|"report(H)"| B
+    R -->|"review(H)"| B
+    I -->|read, write| REPO
+    B --> A
+    A -.->|head| REPO
 ```
 
 ## Files
