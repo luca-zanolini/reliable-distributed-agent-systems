@@ -28,6 +28,12 @@ receives a small, explicit **grant**, denied by default and checked on every req
 descriptions are pinned; tools run in a separate process without the host's credentials
 (Chapter 4). Injection can change what is asked, never what can succeed.
 
+Put several agents on one task and a new enemy appears: **time**. Two agents can both read
+"task free" and both take it; two can edit the same version and one erases the other; a
+check can concern yesterday's version while today's is accepted (Chapter 6). The cures are
+old ones: a single conditional step for ownership, writes conditional on their base version,
+versions named by their contents, and acceptance bound to evidence about that very version.
+
 Finally, a nondeterministic system cannot be judged by a single run. It is judged by an
 **exam**: fixed tasks, validators that check evidence rather than claims, repeated runs,
 immutable records with provenance, traces of every step, and comparisons that account for
@@ -42,6 +48,7 @@ sampling noise (Chapter 5).
 | [3. Durability](03-durability.md) | What survives a crash, and what may be repeated? | 3 | replay reconstructs state; indistinguishability lemma; no exactly-once without the receiver; guarantees by effect class |
 | [4. Authority](04-authority.md) | How much can go wrong, and who decides? | 4 | the blast radius is the grant; injection is bounded, not prevented; pinning; per-request limits |
 | [5. Evaluation](05-evaluation.md) | How do we know it works? | 5 | evidence versus claims; pass@k versus pass^k; intervals on small samples; sound regrading |
+| [6. Coordination](06-coordination.md) | What goes wrong when agents share work? | 6 | check-then-act admits two owners; atomic conditional claims; lost updates and optimistic concurrency; content addressing; version-bound acceptance |
 | [References](references.md) | | | peer-reviewed sources first; preprints labelled |
 
 Each chapter has the same parts: **the picture** (a story to keep in mind), **definitions**,
@@ -65,6 +72,10 @@ and a one-paragraph **refresher**.
 | Harmless tools make a harmless role. | Checks are per request; grant less. | 4.3 |
 | The agent said the tests pass. | That is a claim; the exit code is evidence. | 5.2 |
 | 15/15 beats 14/15. | Not at n = 15; the intervals overlap. | 5.2 |
+| Agents on different tasks cannot interfere. | Every shared file, list or head is a place to interfere. | 6.1, 6.3 |
+| Merging concurrent edits fixes conflicts. | It guarantees convergence, not a correct result. | 6.3 |
+| A worker's own journal prevents repeated work. | Not by other workers; that needs conditional shared state. | 6.6 |
+| Visible in the logs means safe. | Detection is a comparison; safety is refusing what it reveals. | 6.5 |
 
 ## Conventions
 

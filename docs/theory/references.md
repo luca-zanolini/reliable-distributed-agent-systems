@@ -10,11 +10,15 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 - **[BN84]** A. D. Birrell, B. J. Nelson. *Implementing remote procedure calls.* ACM Transactions on Computer Systems 2(1):39–59, 1984. [peer-reviewed]
 - **[Bur06]** M. Burrows. *The Chubby lock service for loosely-coupled distributed systems.* OSDI 2006. [peer-reviewed]
 - **[CGR11]** C. Cachin, R. Guerraoui, L. Rodrigues. *Introduction to Reliable and Secure Distributed Programming*, 2nd ed. Springer, 2011. [book]
+- **[BHG87]** P. A. Bernstein, V. Hadzilacos, N. Goodman. *Concurrency Control and Recovery in Database Systems.* Addison-Wesley, 1987. [book]
 - **[GC89]** C. G. Gray, D. R. Cheriton. *Leases: an efficient fault-tolerant mechanism for distributed file cache consistency.* SOSP 1989. [peer-reviewed]
 - **[GR93]** J. Gray, A. Reuter. *Transaction Processing: Concepts and Techniques.* Morgan Kaufmann, 1993. [book]
+- **[HW90]** M. P. Herlihy, J. M. Wing. *Linearizability: a correctness condition for concurrent objects.* ACM Transactions on Programming Languages and Systems 12(3):463–492, 1990. [peer-reviewed]
+- **[KR81]** H. T. Kung, J. T. Robinson. *On optimistic methods for concurrency control.* ACM Transactions on Database Systems 6(2):213–226, 1981. [peer-reviewed]
 - **[Lam77]** L. Lamport. *Proving the correctness of multiprocess programs.* IEEE Transactions on Software Engineering SE-3(2):125–143, 1977. [peer-reviewed]
 - **[Moh92]** C. Mohan, D. Haderle, B. Lindsay, H. Pirahesh, P. Schwarz. *ARIES: a transaction recovery method supporting fine-granularity locking and partial rollbacks using write-ahead logging.* ACM Transactions on Database Systems 17(1):94–162, 1992. [peer-reviewed]
 - **[Sch90]** F. B. Schneider. *Implementing fault-tolerant services using the state machine approach: a tutorial.* ACM Computing Surveys 22(4):299–319, 1990. [peer-reviewed]
+- **[SPBZ11]** M. Shapiro, N. Preguiça, C. Baquero, M. Zawirski. *Conflict-free replicated data types.* SSS 2011, LNCS 6976. [peer-reviewed]
 - **[Sig10]** B. H. Sigelman et al. *Dapper, a large-scale distributed systems tracing infrastructure.* Google Technical Report dapper-2010-1, 2010. [report]
 
 ## Security
@@ -31,9 +35,12 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 
 ## Language models and agents
 
+- **[Cem25]** M. Cemri, M. Z. Pan, S. Yang, et al. *Why do multi-agent LLM systems fail?* NeurIPS 2025, Datasets and Benchmarks Track. [peer-reviewed]
 - **[Gen23]** S. Geng, M. Josifoski, M. Peyrard, R. West. *Grammar-constrained decoding for structured NLP tasks without finetuning.* EMNLP 2023. [peer-reviewed]
 - **[Hol20]** A. Holtzman, J. Buys, L. Du, M. Forbes, Y. Choi. *The curious case of neural text degeneration.* ICLR 2020. [peer-reviewed]
+- **[Hon24]** S. Hong, M. Zhuge, J. Chen, et al. *MetaGPT: meta programming for a multi-agent collaborative framework.* ICLR 2024. [peer-reviewed]
 - **[MCP]** *Model Context Protocol specification.* https://modelcontextprotocol.io/specification. [spec]
+- **[Nii86]** H. P. Nii. *Blackboard systems: the blackboard model of problem solving and the evolution of blackboard architectures.* AI Magazine 7(2):38–53, 1986. [peer-reviewed]
 - **[Sch23]** T. Schick et al. *Toolformer: language models can teach themselves to use tools.* NeurIPS 2023. [peer-reviewed]
 - **[Vas17]** A. Vaswani et al. *Attention is all you need.* NeurIPS 2017. [peer-reviewed]
 - **[WL23]** B. T. Willard, R. Louf. *Efficient guided generation for large language models.* arXiv:2307.09702, 2023. [arXiv]
