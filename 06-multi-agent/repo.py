@@ -49,8 +49,12 @@ class Repo:
 
     def write(self, path: str, text: str, author: str, note: str = "") -> str:
         """Naive write: replace `path` in the CURRENT head, whatever the writer read."""
+        return self.write_files({path: text}, author, note)
+
+    def write_files(self, changes: dict[str, str], author: str, note: str = "") -> str:
+        """Naive multi-file write, applied to the current head as one new version."""
         files = self.files()
-        files[path] = text
+        files.update(changes)
         parent, self.head = self.head, self._store(files)
         self.log.append(Commit(self.head, parent, author, note))
         return self.head
