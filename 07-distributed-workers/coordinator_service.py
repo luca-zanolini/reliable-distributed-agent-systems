@@ -1,6 +1,10 @@
 """The coordinator as a service: an HTTP server process that workers talk to.
 
-Usage: coordinator_service.py --registry FILE --jobs N [--heartbeat-timeout S] [--slow-complete S]
+Usage: coordinator_service.py --registry FILE --jobs N [--host ADDR] [--port P]
+                              [--heartbeat-timeout S] [--slow-complete S]
+
+--host defaults to 127.0.0.1 (this machine only); use the LAN address, or 0.0.0.0
+for every interface, to accept workers on other machines. --port 0 picks a free port.
 
 Prints "READY <port>" once listening. Every request passes three checks before it
 can touch state: the signature (worker identity), the protocol version, and the
@@ -174,6 +178,8 @@ def main():
     ap.add_argument("--jobs", type=int, default=6)
     ap.add_argument("--heartbeat-timeout", type=float, default=0.6)
     ap.add_argument("--slow-complete", type=float, default=0.0)
+    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--port", type=int, default=0)
     a = ap.parse_args()
     state = State(json.load(open(a.registry)), a.jobs, a.heartbeat_timeout)
 
@@ -184,7 +190,7 @@ def main():
                 state.detect()
     threading.Thread(target=detector, daemon=True).start()
 
-    server = Server(("127.0.0.1", 0), make_handler(state, a.slow_complete))
+    server = Server((a.host, a.port), make_handler(state, a.slow_complete))
     print(f"READY {server.server_address[1]}", flush=True)
     server.serve_forever()
 
