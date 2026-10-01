@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.lucazanolini.rdas-coordinator</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/luca/reliable-distributed-agent-systems/.venv/bin/python</string>
+    <string>coordinator_service.py</string>
+    <string>--registry</string><string>/Users/luca/rdas/registry.json</string>
+    <string>--jobs</string><string>12</string>
+    <string>--host</string><string>0.0.0.0</string>
+    <string>--port</string><string>8080</string>
+    <string>--heartbeat-timeout</string><string>2</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/luca/reliable-distributed-agent-systems/07-distributed-workers</string>
+  <key>UserName</key><string>luca</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>5</integer>
+  <key>StandardOutPath</key><string>/Users/luca/rdas/coordinator.log</string>
+  <key>StandardErrorPath</key><string>/Users/luca/rdas/coordinator.log</string>
+</dict>
+</plist>
