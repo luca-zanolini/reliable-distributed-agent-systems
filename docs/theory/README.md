@@ -34,6 +34,12 @@ check can concern yesterday's version while today's is accepted (Chapter 6). The
 old ones: a single conditional step for ownership, writes conditional on their base version,
 versions named by their contents, and acceptance bound to evidence about that very version.
 
+Spread the agents across processes and machines and the channel itself becomes unreliable
+(Chapter 7): a timeout cannot tell a lost request from a lost reply, so retried operations
+must be idempotent; a silent worker cannot be told from a slow one, so every failure detector
+sometimes accuses the living, and a replaced worker may keep acting, a zombie. Only the
+resource it touches can refuse it, which is the job of fencing tokens.
+
 Finally, a nondeterministic system cannot be judged by a single run. It is judged by an
 **exam**: fixed tasks, validators that check evidence rather than claims, repeated runs,
 immutable records with provenance, traces of every step, and comparisons that account for
@@ -49,6 +55,7 @@ sampling noise (Chapter 5).
 | [4. Authority](04-authority.md) | How much can go wrong, and who decides? | 4 | the blast radius is the grant; injection is bounded, not prevented; pinning; per-request limits |
 | [5. Evaluation](05-evaluation.md) | How do we know it works? | 5 | evidence versus claims; pass@k versus pass^k; intervals on small samples; sound regrading |
 | [6. Coordination](06-coordination.md) | What goes wrong when agents share work? | 6 | check-then-act admits two owners; atomic conditional claims; lost updates and optimistic concurrency; content addressing; version-bound acceptance |
+| [7. Processes and networks](07-processes-and-networks.md) | What changes when agents are separate processes? | 7 | lost request ≡ lost reply; no perfect failure detector; zombies are unavoidable, protection belongs at the resource; one serialization point |
 | [References](references.md) | | | peer-reviewed sources first; preprints labelled |
 
 Each chapter has the same parts: **the picture** (a story to keep in mind), **definitions**,
@@ -76,6 +83,10 @@ and a one-paragraph **refresher**.
 | Merging concurrent edits fixes conflicts. | It guarantees convergence, not a correct result. | 6.3 |
 | A worker's own journal prevents repeated work. | Not by other workers; that needs conditional shared state. | 6.6 |
 | Visible in the logs means safe. | Detection is a comparison; safety is refusing what it reveals. | 6.5 |
+| A timeout means the request failed. | It may have been executed; only the reply was missing. | 7.1 |
+| A suspected worker is dead. | It may only be slow. | 7.2 |
+| Refusing the zombie's report makes it safe. | Only the resource it touched can refuse its action. | 7.3 |
+| A signed message is secret. | Authentication is not encryption. | 7.6 |
 
 ## Conventions
 
