@@ -86,6 +86,34 @@ python experiments.py        # print every experiment's observations
    none were left. Retries help with intermittent loss, not with persistent slowness, and
    a client must survive their exhaustion.
 
+## Across two machines: a real partition
+
+The coordinator on a dedicated lab host, three workers on a laptop, over a home network
+(`run_workers.py`; coordinator with `--host 0.0.0.0`, a 2 s heartbeat timeout, 12 jobs of 4 s).
+
+- **Healthy run** (9 jobs of 1 s): three rounds of three, every job completed once, no
+  suspicions, no duplicate effects.
+- **Partition**: the laptop's Wi-Fi was switched off for about 8 s, two seconds into the run.
+  The laptop could not reach the coordinator for **about 13 s** (re-association and
+  address assignment extend an outage beyond the switch). The coordinator suspected all
+  three workers and reopened their three jobs; the suspicions were revised within a second
+  of reconnection. Meanwhile each worker had finished its job and written its external
+  effect; its report was lost (all retries failed during the outage). Back online, each
+  worker re-claimed a reopened job and performed it again.
+
+| | Result |
+|---|---|
+| coordinator records | 12 jobs, each completed once |
+| reports refused | 0: the stale reports were lost, not late |
+| external effects | **15 for 12 jobs**: the three in-flight jobs duplicated |
+
+The coordinator's records stayed correct while the external system received three
+duplicates. Each reopened job went back to the same worker; had a stale report arrived late
+rather than been lost, an ownership check by worker name would have accepted it. A lease
+(stop before acting when the claim cannot be renewed), an idempotency key per job at the
+external system, and a fencing token per assignment would each have prevented a class of
+these duplicates: the requirements of Stage 8.
+
 ## What this stage does not establish
 
 - **Durability of the coordinator.** Its state is in memory; a coordinator crash loses it
