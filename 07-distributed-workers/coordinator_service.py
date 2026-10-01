@@ -110,7 +110,10 @@ def make_handler(state: State, slow_complete_s: float):
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
-            self.wfile.write(body)
+            try:
+                self.wfile.write(body)
+            except (BrokenPipeError, ConnectionResetError):
+                pass                           # the client gave up waiting: this reply is lost
 
         def do_GET(self):
             if self.path == "/health":
@@ -150,10 +153,19 @@ def make_handler(state: State, slow_complete_s: float):
                     code, out = 200, state.claim(msg.worker)
                 else:
                     code, out = state.complete(msg.worker, msg.job, msg.result)
-            if self.path == "/complete" and slow_complete_s:
-                time.sleep(slow_complete_s)    # processed, but the reply is late: the client may time out
+            if self.path == "/complete" and slow_complete_s and not out.get("duplicate"):
+                time.sleep(slow_complete_s)    # processed, but the first reply is late: the client times out
             self.reply(code, out)
     return Handler
+
+
+class Server(ThreadingHTTPServer):
+    def server_bind(self):
+        # The base class resolves its own host name here (socket.getfqdn), which can
+        # stall for tens of seconds on some hosts; the name is never used.
+        import socketserver
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
 
 
 def main():
@@ -172,7 +184,7 @@ def main():
                 state.detect()
     threading.Thread(target=detector, daemon=True).start()
 
-    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(state, a.slow_complete))
+    server = Server(("127.0.0.1", 0), make_handler(state, a.slow_complete))
     print(f"READY {server.server_address[1]}", flush=True)
     server.serve_forever()
 

@@ -65,6 +65,8 @@ def main():
             journal(job=job, state="reported")
         except RPCError as e:
             journal(job=job, state="refused", status=e.status)
+        except OSError as e:                                       # every retry failed: outcome unknown
+            journal(job=job, state="unreported", error=type(e).__name__)
 
 
 if __name__ == "__main__":
