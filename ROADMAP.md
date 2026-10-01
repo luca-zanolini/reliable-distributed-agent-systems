@@ -108,7 +108,7 @@ trusted central coordinator — and the naive failures deliberately left in.
   for stages 7–9. Multi-agent structure is justified by parallelism, specialization,
   isolation, and independent verification, or not used at all.
 
-## Stage 7 — Distributed Sandboxed Workers *(weeks 14–15)*
+## Stage 7 — Distributed Sandboxed Workers *(complete on a single host; lab host pending)*
 
 Real process and network boundaries; a dedicated always-on lab host comes online.
 
