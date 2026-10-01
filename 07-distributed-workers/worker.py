@@ -46,7 +46,12 @@ def main():
     threading.Thread(target=heartbeats, args=(float(os.environ["HEARTBEAT_S"]),), daemon=True).start()
     work_s = float(os.environ["WORK_SECONDS"])
     while True:
-        reply = client.call("/claim", Claim(v=VERSION, worker=WORKER))
+        try:
+            reply = client.call("/claim", Claim(v=VERSION, worker=WORKER))
+        except OSError:                                            # coordinator unreachable: wait, retry
+            journal(state="coordinator_unreachable")
+            time.sleep(1)
+            continue
         job = reply.get("job")
         if job is None:
             if reply.get("all_done"):
