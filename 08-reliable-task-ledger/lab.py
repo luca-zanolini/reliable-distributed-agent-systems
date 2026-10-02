@@ -138,7 +138,10 @@ class Lab:
 
     def freeze(self, who, sig="STOP"):
         if self.backend == "container":
-            script = ("for p in /proc/[0-9]*; do case \"$(tr '\\0' ' ' < $p/cmdline 2>/dev/null)\" in "
+            # Signal every /app/*.py process except this shell itself: its own command line
+            # contains the pattern too, and a shell that stops itself never returns.
+            script = ("for p in /proc/[0-9]*; do [ \"${p#/proc/}\" = \"$$\" ] && continue; "
+                      "case \"$(tr '\\0' ' ' < $p/cmdline 2>/dev/null)\" in "
                       f"*/app/*.py*) kill -{sig} ${{p#/proc/}};; esac; done")
             sh(C, "exec", f"rdas8-{who}", "sh", "-c", script)
         else:

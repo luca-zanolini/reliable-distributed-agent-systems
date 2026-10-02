@@ -58,8 +58,26 @@ def finish(lab: Lab, timeout_s=90.0) -> dict:
     return lab.status()
 
 
-def claimed_by(lab: Lab, who: str):
-    return next((e for e in lab.journal(who) if e.get("state") == "claimed"), None)
+def holding(lab, who: str, state: str):
+    """(task, epoch) that `who` holds right now according to the ledger, or None."""
+    s = lab.status()
+    return next(((t, v["epoch"]) for t, v in s["tasks"].items()
+                 if v["owner"] == who and v["state"] == state), None) if s else None
+
+
+def freeze_while_holding(lab, who: str, state: str) -> tuple[str, int]:
+    """Freeze `who` at a moment when the ledger says it holds a task in `state`. The
+    ledger is asked again after the signal: the participant may have finished that task
+    in the meantime (container commands take a while); if so, thaw and try again."""
+    for _ in range(40):
+        lab.wait(lambda: holding(lab, who, state), 60, f"{who} to hold a task in {state}")
+        lab.freeze(who)
+        time.sleep(0.2)
+        held = holding(lab, who, state)
+        if held:
+            return held
+        lab.thaw(who)
+    raise TimeoutError(f"could not catch {who} holding a task")
 
 
 def events(lab: Lab, task: str) -> list[str]:
@@ -73,12 +91,12 @@ def events(lab: Lab, task: str) -> list[str]:
 def e1_worker_dies(backend):
     lab = Lab(backend)
     try:
-        grant = lab.wait(lambda: claimed_by(lab, "w1"), 30, "w1 to claim")
+        task, _ = lab.wait(lambda: holding(lab, "w1", "IN_PROGRESS"), 60, "w1 to hold a task")
         lab.kill("w1")
         finish(lab)
-        evs = events(lab, grant["task"])
-        mech = any(e.startswith("expired") for e in evs) and lab.status()["tasks"][grant["task"]]["state"] == "SENT"
-        return lab, mech, f"w1 killed holding {grant['task']}: {' -> '.join(evs)}"
+        evs = events(lab, task)
+        mech = any(e.startswith("expired") for e in evs) and lab.status()["tasks"][task]["state"] == "SENT"
+        return lab, mech, f"w1 killed holding {task}: {' -> '.join(evs)}"
     except Exception:
         lab.close()
         raise
@@ -87,15 +105,13 @@ def e1_worker_dies(backend):
 def e2_zombie(backend):
     lab = Lab(backend, work_s=0.8)
     try:
-        grant = lab.wait(lambda: claimed_by(lab, "w1"), 30, "w1 to claim")
-        lab.freeze("w1")
-        task = grant["task"]
-        lab.wait(lambda: lab.status()["tasks"][task]["epoch"] > grant["token"], 30, "the task to be reassigned")
+        task, token = freeze_while_holding(lab, "w1", "IN_PROGRESS")
+        lab.wait(lambda: lab.status()["tasks"][task]["epoch"] > token, 60, "the task to be reassigned")
         lab.thaw("w1")
         finish(lab)
         fenced = [e for e in lab.journal("w1") if e.get("task") == task and e.get("state") == "fenced"]
         mech = bool(fenced) and lab.status()["counters"]["stale_refused"] >= 1
-        return lab, mech, (f"w1 frozen holding {task} (token {grant['token']}); after thaw its "
+        return lab, mech, (f"w1 frozen holding {task} (token {token}); after thaw its "
                            f"{fenced[0]['path'] if fenced else '?'} was refused STALE: {' -> '.join(events(lab, task))}")
     except Exception:
         lab.close()
@@ -119,14 +135,12 @@ def e3_duplicate_submit(backend):
 def e4_late_checker(backend):
     lab = Lab(backend, work_s=1.2)
     try:
-        grant = lab.wait(lambda: claimed_by(lab, "c1"), 60, "c1 to claim a check")
-        lab.freeze("c1")
-        task = grant["task"]
-        lab.wait(lambda: lab.status()["tasks"][task]["epoch"] > grant["token"], 30, "the check to be reassigned")
+        task, token = freeze_while_holding(lab, "c1", "CHECKING")
+        lab.wait(lambda: lab.status()["tasks"][task]["epoch"] > token, 60, "the check to be reassigned")
         lab.thaw("c1")
         finish(lab)
         fenced = [e for e in lab.journal("c1") if e.get("task") == task and e.get("state") == "fenced"]
-        return lab, bool(fenced), (f"c1 frozen checking {task} (token {grant['token']}); after thaw its "
+        return lab, bool(fenced), (f"c1 frozen checking {task} (token {token}); after thaw its "
                                    f"{fenced[0]['path'] if fenced else '?'} was refused STALE: {' -> '.join(events(lab, task))}")
     except Exception:
         lab.close()
