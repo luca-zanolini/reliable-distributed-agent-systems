@@ -7,6 +7,11 @@
 In both, the ledger is a process on the host, so its address survives its own crashes
 and its journal lives on the host's disk.
 
+Containers run the official python:3.12-slim image unchanged. The code is mounted
+read-only at /app and the single dependency (pydantic, as Linux wheels fetched once
+with uv into ~/rdas/rdas8-deps) read-only at /deps: nothing is built, nothing is
+installed inside a container, and a code change needs no rebuild.
+
 Container networks (container backend):
   rdas8-work   the ledger's side: workers, checkers and the sender reach the ledger
                through this network's gateway, the host
@@ -35,7 +40,8 @@ from wire import get_json
 
 HERE = Path(__file__).resolve().parent
 C = "/usr/local/bin/container"
-IMAGE = "rdas8:latest"
+IMAGE = "python:3.12-slim"
+DEPS = Path.home() / "rdas" / "rdas8-deps"
 
 
 def sh(*args, check=True) -> str:
@@ -204,8 +210,10 @@ class Lab:
         for net in ("rdas8-work", "rdas8-mail"):
             if net not in listed:
                 sh(C, "network", "create", net)
-        if IMAGE.split(":")[0] not in sh(C, "image", "ls"):
-            subprocess.run([C, "build", "-t", IMAGE, "-f", "Containerfile", "."], cwd=HERE, check=True)
+        if not (DEPS / "pydantic").exists():
+            subprocess.run([str(Path.home() / ".local" / "bin" / "uv"), "pip", "install", "--quiet",
+                            "--target", str(DEPS), "--python-platform", "aarch64-unknown-linux-gnu",
+                            "--python-version", "3.12", "pydantic==2.13.5"], check=True)
         subnet = next(l.split()[1] for l in sh(C, "network", "ls").splitlines() if l.startswith("rdas8-work"))
         self.work_gateway = subnet.rsplit(".", 1)[0] + ".1"
 
@@ -213,7 +221,8 @@ class Lab:
         name = f"rdas8-{who}"
         sh(C, "rm", "-f", name, check=False)
         args = [C, "run", "-d", "--init", "--name", name, "-m", "256M", "-c", "1",
-                "-v", f"{workdir}:/work", "-w", "/work"]
+                "-v", f"{HERE}:/app:ro", "-v", f"{DEPS}:/deps:ro", "-v", f"{workdir}:/work", "-w", "/work",
+                "-e", "PYTHONPATH=/app:/deps", "-e", "PYTHONDONTWRITEBYTECODE=1"]
         for net in networks:
             args += ["--network", net]
         for k, v in env.items():

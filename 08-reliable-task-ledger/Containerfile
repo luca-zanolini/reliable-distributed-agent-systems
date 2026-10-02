@@ -1,6 +1,0 @@
-# The image every container in the lab runs: workers, checkers, the sender, the mail service.
-# Build (on the lab host, from this folder):  container build -t rdas8:latest -f Containerfile .
-FROM python:3.12-slim
-RUN pip install --no-cache-dir pydantic==2.13.5
-COPY ledger.py wire.py service.py agent.py sender.py mail_service.py /app/
-WORKDIR /work
