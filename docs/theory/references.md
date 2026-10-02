@@ -17,6 +17,7 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 - **[GC89]** C. G. Gray, D. R. Cheriton. *Leases: an efficient fault-tolerant mechanism for distributed file cache consistency.* SOSP 1989. [peer-reviewed]
 - **[GR93]** J. Gray, A. Reuter. *Transaction Processing: Concepts and Techniques.* Morgan Kaufmann, 1993. [book]
 - **[HW90]** M. P. Herlihy, J. M. Wing. *Linearizability: a correctness condition for concurrent objects.* ACM Transactions on Programming Languages and Systems 12(3):463–492, 1990. [peer-reviewed]
+- **[Kle17]** M. Kleppmann. *Designing Data-Intensive Applications.* O'Reilly, 2017. [book]
 - **[KR81]** H. T. Kung, J. T. Robinson. *On optimistic methods for concurrency control.* ACM Transactions on Database Systems 6(2):213–226, 1981. [peer-reviewed]
 - **[Lam77]** L. Lamport. *Proving the correctness of multiprocess programs.* IEEE Transactions on Software Engineering SE-3(2):125–143, 1977. [peer-reviewed]
 - **[MB76]** R. M. Metcalfe, D. R. Boggs. *Ethernet: distributed packet switching for local computer networks.* Communications of the ACM 19(7):395–404, 1976. [peer-reviewed]

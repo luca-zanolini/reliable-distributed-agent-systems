@@ -40,6 +40,15 @@ must be idempotent; a silent worker cannot be told from a slow one, so every fai
 sometimes accuses the living, and a replaced worker may keep acting, a zombie. Only the
 resource it touches can refuse it, which is the job of fencing tokens.
 
+So the work gets a **ledger** (Chapter 8): one append-only, durable record of every task,
+whose state may move only along declared edges and which answers nobody before its disk
+knows. Each claim raises the task's epoch and hands it out as a token; only the current
+token counts, so a zombie's late news is refused whatever the clocks say, and leases only
+decide how soon work moves. The irreversible effect cannot be atomic with its record, so
+it is preceded by an intent, retried until answered, and deduplicated by the receiver on a
+key that names the effect: "exactly once" is built at the receiver, never promised by the
+channel.
+
 Finally, a nondeterministic system cannot be judged by a single run. It is judged by an
 **exam**: fixed tasks, validators that check evidence rather than claims, repeated runs,
 immutable records with provenance, traces of every step, and comparisons that account for
@@ -56,6 +65,7 @@ sampling noise (Chapter 5).
 | [5. Evaluation](05-evaluation.md) | How do we know it works? | 5 | evidence versus claims; pass@k versus pass^k; intervals on small samples; sound regrading |
 | [6. Coordination](06-coordination.md) | What goes wrong when agents share work? | 6 | check-then-act admits two owners; atomic conditional claims; lost updates and optimistic concurrency; content addressing; version-bound acceptance |
 | [7. Processes and networks](07-processes-and-networks.md) | What changes when agents are separate processes? | 7 | lost request ≡ lost reply; no perfect failure detector; zombies are unavoidable, protection belongs at the resource; one serialization point |
+| [8. Ledgers and execution semantics](08-ledgers-and-execution-semantics.md) | How does shared work survive crashes, retries and zombies? | 8 | save before reply; fencing is time-free; no ordering of record and effect is crash-safe; effectively-once = intent + retry + receiver dedup |
 | [References](references.md) | | | peer-reviewed sources first; preprints labelled |
 
 Each chapter has the same parts: **the picture** (a story to keep in mind), **definitions**,
@@ -87,6 +97,10 @@ and a one-paragraph **refresher**.
 | A suspected worker is dead. | It may only be slow. | 7.2 |
 | Refusing the zombie's report makes it safe. | Only the resource it touched can refuse its action. | 7.3 |
 | A signed message is secret. | Authentication is not encryption. | 7.6 |
+| A lease guarantees one owner. | A frozen holder outlives it; the token decides. | 8.2 |
+| Fencing needs synchronised clocks. | It uses no time at all; clocks only affect liveness. | 8.2 |
+| Write the record first and nothing is duplicated. | Then it can be lost instead. | 8.3 |
+| Our messaging gives exactly-once delivery. | Built from retries plus a receiver that deduplicates. | 8.4 |
 
 ## Conventions
 
