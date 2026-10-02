@@ -20,7 +20,16 @@ import json
 import time
 from collections import Counter
 
-from lab import Lab
+from lab import Lab as _Lab
+
+# Containers add latency to every command (starting, killing, freezing a VM), so in the
+# container backend jobs and leases are stretched; the scenarios are otherwise identical.
+SCALE = {"proc": 1.0, "container": 3.0}
+
+
+def Lab(backend, work_s=0.4, lease_s=1.0, **kw):
+    k = SCALE[backend]
+    return _Lab(backend, work_s=work_s * k, lease_s=lease_s * k, **kw)
 
 PREDICTIONS = {
     1: "lease runs out, the ledger reopens the task, another worker does it: done once, a bit later",
@@ -183,11 +192,11 @@ def e8_ledger_down(backend):
                  "work in progress")
         held = {t for t, v in lab.status()["tasks"].items() if v["state"] == "IN_PROGRESS"}
         lab.kill_ledger()
-        time.sleep(2.0)                                       # down for twice the lease
+        time.sleep(2.0 * SCALE[backend])                      # down for twice the lease
         lab.start_ledger()
         finish(lab)
         expired = {e["task"] for e in lab.ledger_events() if e["kind"] == "expired"}
-        return lab, not held & expired, (f"ledger down 2 s (lease 1 s) while {sorted(held)} were in progress; "
+        return lab, not held & expired, (f"ledger down {2 * SCALE[backend]:.0f} s (lease {SCALE[backend]:.0f} s) while {sorted(held)} were in progress; "
                                          f"after restart none of them expired: {sorted(held & expired) or 'none'}")
     except Exception:
         lab.close()

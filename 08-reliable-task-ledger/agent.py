@@ -14,7 +14,7 @@ verdict names the exact draft it judged.
 
 While it holds a task, a background thread renews the lease every third of the lease
 time. A STALE answer to anything means the task was taken away: the agent stops and
-discards its work. It keeps a local journal (agent.jsonl in its working directory)
+discards its work. A finished result is reported until the ledger answers. It keeps a local journal (agent.jsonl in its working directory)
 of what it did and what it was told, for the experiments to read.
 """
 
@@ -65,14 +65,20 @@ class Lease:
 
 
 def report(path: str, message, task: str, token: int) -> None:
-    try:
-        out = ledger.call(path, message)
-        journal(task=task, token=token, state="reported", path=path, duplicate=out.get("duplicate", False))
-    except RPCError as e:
-        journal(task=task, token=token, state="fenced" if e.status == 409 else "refused",
-                path=path, status=e.status)
-    except OSError as e:
-        journal(task=task, token=token, state="unreported", path=path, error=type(e).__name__)
+    """Report until the ledger answers: finished work is not dropped because the ledger
+    was briefly unreachable. The same body is resent, so a repeat is recognised."""
+    while True:
+        try:
+            out = ledger.call(path, message)
+            journal(task=task, token=token, state="reported", path=path, duplicate=out.get("duplicate", False))
+            return
+        except RPCError as e:
+            journal(task=task, token=token, state="fenced" if e.status == 409 else "refused",
+                    path=path, status=e.status)
+            return
+        except OSError as e:
+            journal(task=task, token=token, state="ledger_unreachable", path=path, error=type(e).__name__)
+            time.sleep(0.5)
 
 
 def draft_for(grant: dict) -> str:
