@@ -27,7 +27,8 @@ where an agent's claims become the system's facts, by evidence rather than asser
 | 5 — [Evals and observability](05-evals/) | done | Task suite with evidence-based validators, per-run records with configuration hashes and provenance, span traces, regrading, regression reports. First comparison: claude-sonnet-5 matched claude-opus-4-8 on the suite at half the cost (30 runs). |
 | 6 — [Multi-agent, one machine](06-multi-agent/) | done | Planner, two concurrent implementers, a test program, a reviewer and a naive coordinator over a content-addressed repository; six coordination failures reproduced on demand by a deterministic scheduler (five end in a silent acceptance). |
 | 7 — [Distributed workers](07-distributed-workers/) | done (single host) | Coordinator as a server process; workers as separate processes with their own sandboxes and secrets; signed, versioned, validated RPC; heartbeat failure detection. A killed worker is detected and its job recovered; a frozen worker becomes a zombie whose external effect is duplicated. |
-| 8 — Reliable task ledger | next | Durable ledger, leases, fencing tokens, idempotency keys. |
+| 8 — [Reliable task ledger](08-reliable-task-ledger/) | done (containers on the lab host) | A durable, journaled ledger with legal transitions only; leases and per-task fencing tokens saved before every reply; an intent before the irreversible send, the task id as idempotency key, deduplication at the receiver. Workers and checkers in containers with no route to the mail service. Eight failure experiments (zombies, crashes between save and reply, lost replies, timeouts) all confirmed: every email delivered exactly once; without the receiver's memory, twice. |
+| 9 — Replicated coordination | next | CRDT vs Raft vs BFT for the ledger. |
 
 **Theory companion:** [docs/theory](docs/theory/) states the concepts behind each stage
 (definitions, propositions with proofs, common misconceptions) and connects them to the
