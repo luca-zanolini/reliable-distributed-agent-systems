@@ -49,6 +49,14 @@ it is preceded by an intent, retried until answered, and deduplicated by the rec
 key that names the effect: "exactly once" is built at the receiver, never promised by the
 channel.
 
+One ledger is durable but not available. So its state moves into a store **replicated** on a
+majority of machines that answers nothing before the majority has it (Chapter 9), and the
+ledger's rules move into stateless front-ends that change a task only *if it is still the
+version they read*. Then no failure of a minority takes back a token, two front-ends can never
+hand out the same one (blind writes would), time stays in one place, and fencing still rests
+on epochs alone. Ownership cannot be merged after the fact, so it needs consensus; what remains
+trusted is the coordination plane itself.
+
 Finally, a nondeterministic system cannot be judged by a single run. It is judged by an
 **exam**: fixed tasks, validators that check evidence rather than claims, repeated runs,
 immutable records with provenance, traces of every step, and comparisons that account for
@@ -66,6 +74,7 @@ sampling noise (Chapter 5).
 | [6. Coordination](06-coordination.md) | What goes wrong when agents share work? | 6 | check-then-act admits two owners; atomic conditional claims; lost updates and optimistic concurrency; content addressing; version-bound acceptance |
 | [7. Processes and networks](07-processes-and-networks.md) | What changes when agents are separate processes? | 7 | lost request ≡ lost reply; no perfect failure detector; zombies are unavoidable, protection belongs at the resource; one serialization point |
 | [8. Ledgers and execution semantics](08-ledgers-and-execution-semantics.md) | How does shared work survive crashes, retries and zombies? | 8 | save before reply; fencing is time-free; no ordering of record and effect is crash-safe; effectively-once = intent + retry + receiver dedup |
+| [9. Replication](09-replication.md) | How does the ledger survive the loss of a machine? | 9 | commit before reply; conditional writes give unique holders across front-ends; blind writes lose updates; a minority decides nothing; fencing survives failover; mutual exclusion cannot be merged |
 | [References](references.md) | | | peer-reviewed sources first; preprints labelled |
 
 Each chapter has the same parts: **the picture** (a story to keep in mind), **definitions**,
@@ -101,6 +110,10 @@ and a one-paragraph **refresher**.
 | Fencing needs synchronised clocks. | It uses no time at all; clocks only affect liveness. | 8.2 |
 | Write the record first and nothing is duplicated. | Then it can be lost instead. | 8.3 |
 | Our messaging gives exactly-once delivery. | Built from retries plus a receiver that deduplicates. | 8.4 |
+| A replicated store makes writes safe. | Only conditional writes; blind ones lose updates. | 9.3 |
+| Lease deadlines should be replicated. | Time is measured in one place; its effects are recorded as writes. | 9.5 |
+| A CRDT would keep claims available in a partition. | It would grant two owners. | 9.8 |
+| Raft tolerates a lying member. | It tolerates crashes, not arbitrary behaviour. | 9 |
 
 ## Conventions
 

@@ -2,7 +2,7 @@
 
 Cited by key from the chapters. Labels: **[peer-reviewed]** journal or conference
 proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
-**[report]** technical report; **[book]**; **[spec]** protocol specification.
+**[report]** technical report; **[thesis]** doctoral thesis; **[book]**; **[spec]** protocol specification.
 
 ## Distributed systems and fault tolerance
 
@@ -22,6 +22,8 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 - **[Lam77]** L. Lamport. *Proving the correctness of multiprocess programs.* IEEE Transactions on Software Engineering SE-3(2):125–143, 1977. [peer-reviewed]
 - **[MB76]** R. M. Metcalfe, D. R. Boggs. *Ethernet: distributed packet switching for local computer networks.* Communications of the ACM 19(7):395–404, 1976. [peer-reviewed]
 - **[Moh92]** C. Mohan, D. Haderle, B. Lindsay, H. Pirahesh, P. Schwarz. *ARIES: a transaction recovery method supporting fine-granularity locking and partial rollbacks using write-ahead logging.* ACM Transactions on Database Systems 17(1):94–162, 1992. [peer-reviewed]
+- **[OO14]** D. Ongaro, J. Ousterhout. *In search of an understandable consensus algorithm.* USENIX ATC 2014. [peer-reviewed]
+- **[Ong14]** D. Ongaro. *Consensus: Bridging Theory and Practice.* PhD thesis, Stanford University, 2014. [thesis]
 - **[Sch90]** F. B. Schneider. *Implementing fault-tolerant services using the state machine approach: a tutorial.* ACM Computing Surveys 22(4):299–319, 1990. [peer-reviewed]
 - **[SPBZ11]** M. Shapiro, N. Preguiça, C. Baquero, M. Zawirski. *Conflict-free replicated data types.* SSS 2011, LNCS 6976. [peer-reviewed]
 - **[SRC84]** J. H. Saltzer, D. P. Reed, D. D. Clark. *End-to-end arguments in system design.* ACM Transactions on Computer Systems 2(4):277–288, 1984. [peer-reviewed]
