@@ -117,7 +117,7 @@ Real process and network boundaries; a dedicated always-on lab host comes online
 - **Exit:** killing one worker cannot corrupt another worker's state, and the
   coordinator detects and recovers from the loss.
 
-## Stage 8 — Reliable Task Ledger & Execution Semantics *(weeks 16–17)*
+## Stage 8 — Reliable Task Ledger & Execution Semantics *(complete)*
 
 The first serious coordination substrate: authoritative task state.
 
@@ -132,7 +132,7 @@ The first serious coordination substrate: authoritative task state.
   in the declared scope. "Exactly once" is treated as an end-to-end property, never
   a transport guarantee.
 
-## Stage 9 — Replicated Coordination: CRDT vs Raft vs BFT *(weeks 18–20)*
+## Stage 9 — Replicated Coordination: CRDT vs Raft vs BFT *(complete: etcd + stateless front-ends; no CRDT, justified)*
 
 The coordination layer becomes fault tolerant — with the correct primitive per state.
 
