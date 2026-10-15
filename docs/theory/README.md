@@ -57,6 +57,17 @@ hand out the same one (blind writes would), time stays in one place, and fencing
 on epochs alone. Ownership cannot be merged after the fact, so it needs consensus; what remains
 trusted is the coordination plane itself.
 
+Then the honesty assumption goes (Chapter 10). Workers, checkers, the sender, the front-ends and the
+store's members may all **lie**. Shared-secret seals cannot help, since whoever checks one can forge it;
+so every claim is **signed** and carries its own evidence: the issuer signs the task, each checker
+signs its verdict on this exact text for this exact task, and the mail service, installed with the
+keys it trusts and the policy it applies, delivers nothing the evidence does not cover. A lying
+courier or ledger can then only refuse to work, and signed receipts make its refusals provable. A
+certificate means "some honest checker approved" only if its signers could not all have failed
+together: three copies of one model are one failure domain, so the policy counts **failure domains,
+not signatures**. A Byzantine fault-tolerant ledger adds progress against lying replicas; it is not
+what keeps the customer safe.
+
 Finally, a nondeterministic system cannot be judged by a single run. It is judged by an
 **exam**: fixed tasks, validators that check evidence rather than claims, repeated runs,
 immutable records with provenance, traces of every step, and comparisons that account for
@@ -75,6 +86,7 @@ sampling noise (Chapter 5).
 | [7. Processes and networks](07-processes-and-networks.md) | What changes when agents are separate processes? | 7 | lost request ≡ lost reply; no perfect failure detector; zombies are unavoidable, protection belongs at the resource; one serialization point |
 | [8. Ledgers and execution semantics](08-ledgers-and-execution-semantics.md) | How does shared work survive crashes, retries and zombies? | 8 | save before reply; fencing is time-free; no ordering of record and effect is crash-safe; effectively-once = intent + retry + receiver dedup |
 | [9. Replication](09-replication.md) | How does the ledger survive the loss of a machine? | 9 | commit before reply; conditional writes give unique holders across front-ends; blind writes lose updates; a minority decides nothing; fencing survives failover; mutual exclusion cannot be merged |
+| [10. Byzantine participants](10-byzantine.md) | What can be guaranteed when participants and the coordination plane lie? | 10 | MACs are not transferable; witness quorums over fail-prone systems; safety at the edge; counting is unsound under correlated failures; a lying ledger loses only liveness; dropped votes are provable; f+1 matching replies from a BFT log |
 | [References](references.md) | | | peer-reviewed sources first; preprints labelled |
 
 Each chapter has the same parts: **the picture** (a story to keep in mind), **definitions**,
