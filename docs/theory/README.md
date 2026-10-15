@@ -68,6 +68,14 @@ together: three copies of one model are one failure domain, so the policy counts
 not signatures**. A Byzantine fault-tolerant ledger adds progress against lying replicas; it is not
 what keeps the customer safe.
 
+When the work is code, "done" becomes something that can be checked by doing it again (Chapter 11).
+A worker's report of its own run says nothing; the issuer pins the **acceptance tests** and marks
+where a person must look; **verifiers** run exactly those tests on exactly the submitted version and
+sign what happened; and the **repository**, which owns the current code, works out by itself what
+changed and accepts a version only with valid attestations, the review the issuer required, and **on
+top of the code it was tested on**. Flaky tests are detected, not voted away; tests answered without
+being understood are what held-out tests and reviewers are for.
+
 Finally, a nondeterministic system cannot be judged by a single run. It is judged by an
 **exam**: fixed tasks, validators that check evidence rather than claims, repeated runs,
 immutable records with provenance, traces of every step, and comparisons that account for
@@ -87,6 +95,7 @@ sampling noise (Chapter 5).
 | [8. Ledgers and execution semantics](08-ledgers-and-execution-semantics.md) | How does shared work survive crashes, retries and zombies? | 8 | save before reply; fencing is time-free; no ordering of record and effect is crash-safe; effectively-once = intent + retry + receiver dedup |
 | [9. Replication](09-replication.md) | How does the ledger survive the loss of a machine? | 9 | commit before reply; conditional writes give unique holders across front-ends; blind writes lose updates; a minority decides nothing; fencing survives failover; mutual exclusion cannot be merged |
 | [10. Byzantine participants](10-byzantine.md) | What can be guaranteed when participants and the coordination plane lie? | 10 | MACs are not transferable; witness quorums over fail-prone systems; safety at the edge; counting is unsound under correlated failures; a lying ledger loses only liveness; dropped votes are provable; f+1 matching replies from a BFT log |
+| [11. Verifiable work](11-verifiable-work.md) | When can work be committed on evidence rather than the worker's word? | 11 | self-reports carry no information; tests belong to the task; safety of commits; the lost update at the commit point; nondeterminism is detectable, not resolvable; overfitting to tests; 2f+1 witnesses, not 3f+1 |
 | [References](references.md) | | | peer-reviewed sources first; preprints labelled |
 
 Each chapter has the same parts: **the picture** (a story to keep in mind), **definitions**,

@@ -27,6 +27,8 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 - **[Lam77]** L. Lamport. *Proving the correctness of multiprocess programs.* IEEE Transactions on Software Engineering SE-3(2):125–143, 1977. [peer-reviewed]
 - **[LNRZ25]** A. Lewis-Pye, J. Neu, T. Roughgarden, L. Zanolini. *Accountable liveness.* ACM CCS 2025. [peer-reviewed]
 - **[LSP82]** L. Lamport, R. Shostak, M. Pease. *The Byzantine generals problem.* ACM Transactions on Programming Languages and Systems 4(3):382–401, 1982. [peer-reviewed]
+- **[Luo14]** Q. Luo, F. Hariri, L. Eloussi, D. Marinov. *An empirical analysis of flaky tests.* FSE 2014. [peer-reviewed]
+- **[LZ22]** C. Lamb, S. Zacchiroli. *Reproducible builds: increasing the integrity of software supply chains.* IEEE Software 39(2):62–70, 2022. [peer-reviewed]
 - **[MB76]** R. M. Metcalfe, D. R. Boggs. *Ethernet: distributed packet switching for local computer networks.* Communications of the ACM 19(7):395–404, 1976. [peer-reviewed]
 - **[MR98]** D. Malkhi, M. Reiter. *Byzantine quorum systems.* Distributed Computing 11(4):203–213, 1998. [peer-reviewed]
 - **[Moh92]** C. Mohan, D. Haderle, B. Lindsay, H. Pirahesh, P. Schwarz. *ARIES: a transaction recovery method supporting fine-granularity locking and partial rollbacks using write-ahead logging.* ACM Transactions on Database Systems 17(1):94–162, 1992. [peer-reviewed]
@@ -35,6 +37,7 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 - **[Sch90]** F. B. Schneider. *Implementing fault-tolerant services using the state machine approach: a tutorial.* ACM Computing Surveys 22(4):299–319, 1990. [peer-reviewed]
 - **[SPBZ11]** M. Shapiro, N. Preguiça, C. Baquero, M. Zawirski. *Conflict-free replicated data types.* SSS 2011, LNCS 6976. [peer-reviewed]
 - **[SRC84]** J. H. Saltzer, D. P. Reed, D. D. Clark. *End-to-end arguments in system design.* ACM Transactions on Computer Systems 2(4):277–288, 1984. [peer-reviewed]
+- **[Smi15]** E. K. Smith, E. T. Barr, C. Le Goues, Y. Brun. *Is the cure worse than the disease? Overfitting in automated program repair.* ESEC/FSE 2015. [peer-reviewed]
 - **[Sig10]** B. H. Sigelman et al. *Dapper, a large-scale distributed systems tracing infrastructure.* Google Technical Report dapper-2010-1, 2010. [report]
 
 ## Security
@@ -48,6 +51,7 @@ proceedings; **[arXiv]** preprint, not peer-reviewed at the time of writing;
 - **[JL17]** S. Josefsson, I. Liusvaara. *Edwards-curve digital signature algorithm (EdDSA).* RFC 8032, IETF, 2017. [spec]
 - **[Lamp73]** B. W. Lampson. *A note on the confinement problem.* Communications of the ACM 16(10):613–615, 1973. [peer-reviewed]
 - **[SS75]** J. H. Saltzer, M. D. Schroeder. *The protection of information in computer systems.* Proceedings of the IEEE 63(9):1278–1308, 1975. [peer-reviewed]
+- **[TA19]** S. Torres-Arias, H. Afzali, T. K. Kuppusamy, R. Curtmola, J. Cappos. *in-toto: providing farm-to-table guarantees for bits and bytes.* USENIX Security 2019. [peer-reviewed]
 - **[Zha24]** Q. Zhan, Z. Liang, Z. Ying, D. Kang. *InjecAgent: benchmarking indirect prompt injections in tool-integrated large language model agents.* Findings of ACL 2024. [peer-reviewed]
 
 ## Language models and agents
